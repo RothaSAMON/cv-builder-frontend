@@ -22,7 +22,7 @@
 .content-container {
   border-top: 1px solid #ddd;
 
-  background-color: white !important; /* Force white background */
+  background-color: white !important;
   min-height: 100vh; /* Ensure full height */
   margin: 0;
   padding: 0;

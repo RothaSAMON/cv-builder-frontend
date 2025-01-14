@@ -1,6 +1,7 @@
 <template>
-  <div>
-    Dashboard
+  <div class="container">
+    <DashboardGreetingCard />
+    <DashboardGuideCard />
   </div>
 </template>
 
@@ -10,4 +11,10 @@ definePageMeta({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+</style>

@@ -55,7 +55,7 @@ import {
 
 /* Change the background color of the arrow icon */
 :deep(.ant-layout-sider-trigger) {
-  background-color: #3da5ff !important;
+  background-color: var(--secondary-background-color) !important;
   color: white;
 }
 </style>
