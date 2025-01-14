@@ -12,10 +12,10 @@
       </NuxtLink>
       <ul class="nav-links">
         <li>
-          <NuxtLink to="/about">Login</NuxtLink>
+          <NuxtLink to="/login">Log in</NuxtLink>
         </li>
         <li>
-          <NuxtLink to="/login">Signup</NuxtLink>
+          <NuxtLink to="/signup">Sign up</NuxtLink>
         </li>
       </ul>
     </nav>
