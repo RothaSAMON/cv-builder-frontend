@@ -1,34 +1,18 @@
-<!-- <template>
-  <div class="m-2 flex justify-end items-center px-6">
-    <section class="flex items-center gap-4">
-      <a-avatar
-        size="large"
-        src="https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
-      />
-      <div class="flex flex-col justify-center mt-2">
-        <h3 class="font-medium">Samon Rotha</h3>
-        <p class="text-gray-500">Set your target role</p>
-      </div>
-    </section>
-  </div>
-</template>
-
-<script setup lang="ts"></script> -->
-
 <template>
-  <div class="header-container">
+  <header class="header-container">
     <!-- <div class="header-title">Nuxt Dashboard</div> -->
     <section class="user-info">
       <a-avatar
+        class="user-avatar"
         size="large"
-        src="https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
+        src="https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5MC00NTk4LTk2OTYtNDU3NTJiM2QxNzM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
       />
       <div class="user-details">
         <h3 class="user-name">Samon Rotha</h3>
         <p class="user-role">Set your target role</p>
       </div>
     </section>
-  </div>
+  </header>
 </template>
 
 <script setup lang="ts"></script>
@@ -54,6 +38,9 @@
   justify-content: center;
   margin-top: 0.5rem;
 }
+.user-details h3 {
+  margin: 0;
+}
 
 .user-name {
   font-weight: 500;
@@ -61,5 +48,9 @@
 
 .user-role {
   color: gray;
+}
+
+.user-avatar {
+  border: 2px solid var(--secondary-color);
 }
 </style>

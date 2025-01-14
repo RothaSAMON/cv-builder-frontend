@@ -42,6 +42,10 @@
         </a-button>
       </a-form-item>
     </a-form>
+
+    <section class="ask-signup">
+      <p>Don't have an account? <NuxtLink class="signup-link" to="/signup">Sign Up</NuxtLink></p>
+    </section>
   </div>
 </template>
 
@@ -79,8 +83,8 @@ export default {
   background-color: #41bbff;
 }
 .login-title {
-    margin-bottom: 24px;
-    margin-top: 12px;
+  margin-bottom: 24px;
+  margin-top: 12px;
 }
 .login-title h2 {
   margin: 0;
@@ -91,5 +95,13 @@ export default {
   margin: 0;
   font-size: 14px;
   color: var(--sub-text-color);
+}
+.ask-signup {
+  font-size: 14px;
+  color: var(--secondary-text-color);
+}
+.ask-signup .signup-link {
+  color: var(--primary-color);
+  text-decoration: none;
 }
 </style>
