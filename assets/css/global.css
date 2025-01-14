@@ -1,0 +1,28 @@
+/* assets/css/global.css */
+:root {
+  --primary-color: #41BBFF;
+  --secondary-color: #ec930c;
+
+  --text-color: #0f3871;
+  --secondary-text-color: #000000;
+  --sub-text-color: #828ba2;
+
+  --background-color: #ffffff;
+
+  --font-size-base: 16px;
+  --border-radius: 8px;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}

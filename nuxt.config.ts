@@ -6,11 +6,22 @@ export default defineNuxtConfig({
   plugins: ["@/plugins/ant-design-vue.js"],
 
   // Add Ant Design styles here
-  css: ["@/assets/css/tailwind.css"],
+  css: ["@/assets/css/global.css"],
+
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
+    },
+  },
+
+  modules: ["@nuxtjs/google-fonts", "@nuxt/icon", "@nuxt/image"],
+
+  googleFonts: {
+    families: {
+      Montserrat: true,
+      Roboto: true,
+      Poppins: true,
     },
   },
 });
