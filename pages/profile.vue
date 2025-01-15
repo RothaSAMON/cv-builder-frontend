@@ -79,7 +79,8 @@ const routes = [
   align-items: flex-start;
   gap: 30px; /* Adjust gap as needed */
   width: 100%;
-  max-width: 1200px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .profile-card {
