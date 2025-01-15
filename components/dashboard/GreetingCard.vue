@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { AppstoreOutlined } from "@ant-design/icons-vue"; // Importing the icon
+import { AppstoreOutlined } from "@ant-design/icons-vue";
 
 export default {
   name: "CardGreeting",
