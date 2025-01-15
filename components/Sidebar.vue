@@ -2,24 +2,28 @@
   <a-layout-sider breakpoint="lg" collapsible class="sidebar-container">
     <div class="logo">Rezume</div>
     <a-menu theme="light" mode="inline" :defaultSelectedKeys="['1']">
+      <!-- Dashboard -->
       <a-menu-item key="1">
         <template #icon><AppstoreOutlined /></template>
-        <span>Dashboard</span>
+        <nuxt-link to="/dashboard">Dashboard</nuxt-link>
       </a-menu-item>
 
+      <!-- Resumes -->
       <a-menu-item key="2">
         <template #icon><FolderOutlined /></template>
-        <span>Resumes</span>
+        <nuxt-link to="/resumes">Resumes</nuxt-link>
       </a-menu-item>
 
+      <!-- Profile -->
       <a-menu-item key="3">
         <template #icon><UserOutlined /></template>
-        <span>Profile</span>
+        <nuxt-link to="/profile">Profile</nuxt-link>
       </a-menu-item>
 
+      <!-- Logout -->
       <a-menu-item key="4">
         <template #icon><LogoutOutlined /></template>
-        <span>Logout</span>
+        <nuxt-link >Logout</nuxt-link>
       </a-menu-item>
     </a-menu>
   </a-layout-sider>
@@ -29,7 +33,6 @@
 import {
   AppstoreOutlined,
   UserOutlined,
-  SettingOutlined,
   FolderOutlined,
   LogoutOutlined,
 } from "@ant-design/icons-vue";
