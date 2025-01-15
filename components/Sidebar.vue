@@ -21,11 +21,25 @@
       </a-menu-item>
 
       <!-- Logout -->
-      <a-menu-item key="4">
+      <a-menu-item key="4" @click="showLogoutModal">
         <template #icon><LogoutOutlined /></template>
-        <nuxt-link >Logout</nuxt-link>
+        Logout
       </a-menu-item>
     </a-menu>
+
+    <!-- Modal for Logout Confirmation -->
+    <a-modal
+      v-model:visible="isModalVisible"
+      :ok-type="'danger'"
+      :icon="warningIcon"
+      @ok="handleLogout"
+      @cancel="handleCancel"
+    >
+      <template #title>
+        <span style="color: red">Confirm Logout</span>
+      </template>
+      <p style="color: var(--error-color)">Are you sure you want to logout?</p>
+    </a-modal>
   </a-layout-sider>
 </template>
 
@@ -35,25 +49,43 @@ import {
   UserOutlined,
   FolderOutlined,
   LogoutOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons-vue";
+import { ref } from "vue";
+
+const isModalVisible = ref(false);
+const warningIcon = ExclamationCircleOutlined;
+
+const showLogoutModal = () => {
+  isModalVisible.value = true;
+};
+
+const handleLogout = () => {
+  console.log("Logged out");
+  isModalVisible.value = false;
+};
+
+const handleCancel = () => {
+  isModalVisible.value = false;
+};
 </script>
 
 <style scoped>
 .sidebar-container {
   background-color: #ffffff;
   position: sticky;
-  top: 0; /* Make it sticky at the top */
-  height: 100vh; /* Ensure it spans the full height of the viewport */
-  z-index: 10; /* Keep it above other content */
-  border-right: 1px solid #ddd; /* Add a border on the right side */
+  top: 0;
+  height: 100vh;
+  z-index: 10;
+  border-right: 1px solid #ddd;
 }
 
 .logo {
   text-align: center;
   color: black;
-  font-size: 1.125rem; /* Equivalent to text-lg */
-  font-weight: 600; /* Equivalent to font-semibold */
-  padding: 1rem 0; /* Equivalent to py-4 */
+  font-size: 1.125rem;
+  font-weight: 600;
+  padding: 1rem 0;
 }
 
 /* Change the background color of the arrow icon */
@@ -61,4 +93,5 @@ import {
   background-color: var(--secondary-background-color) !important;
   color: white;
 }
+
 </style>
