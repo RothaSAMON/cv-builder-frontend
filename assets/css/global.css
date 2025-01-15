@@ -7,6 +7,12 @@
   --secondary-text-color: #000000;
   --sub-text-color: #828ba2;
 
+  --error-color: #ff1e21;
+  --error-color-100: #FEF4F3;
+  --error-color-200: #F78CA2;
+
+  --border-color: #ddd;
+
   --background-color: #ffffff;
   --secondary-background-color: #0f3871;
 
