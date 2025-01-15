@@ -1,61 +1,70 @@
 <template>
-    <DashboardPageHeader
-      title="Profile"
-      subTitle="Create your Profile to find a job"
-      :breadcrumbRoutes="routes"
-    />
-    <div class="profile-container">
-      <a-row justify="center" class="profile-content-wrapper">
-        <!-- Profile Card -->
-        <div class="profile-card">
-          <a-avatar
-            class="profile-avatar"
-            :size="100"
-            src="https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5MC00NTk4LTk2OTYtNDU3NTJiM2QxNzM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
-          />
-          <div class="action-buttons">
-            <a-button type="primary" class="edit-button">Upload Image</a-button>
-            <a-button danger class="delete-button">Delete Profile</a-button>
-          </div>
+  <DashboardPageHeader
+    title="Profile"
+    subTitle="Create your Profile to find a job"
+    :breadcrumbRoutes="routes"
+  />
+  <div class="profile-container">
+    <a-row justify="center" class="profile-content-wrapper">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <a-avatar
+          class="profile-avatar"
+          :size="100"
+          src="https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5MC00NTk4LTk2OTYtNDU3NTJiM2QxNzM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
+        />
+        <div class="action-buttons">
+          <a-button type="primary" class="edit-button">Upload Image</a-button>
+          <a-button danger class="delete-button">Delete Profile</a-button>
         </div>
-  
-        <!-- Profile Details -->
-        <a-col :span="16" class="profile-details">
-          <h3>Profile Details</h3>
-          <a-form :layout="'vertical'" class="details-form">
-            <a-form-item label="First Name" required>
-              <a-input placeholder="John" />
-            </a-form-item>
-  
-            <a-form-item label="Last Name" required>
-              <a-input placeholder="Doe" />
-            </a-form-item>
-  
-            <a-form-item label="Gender" required>
-              <a-select placeholder="Select Gender">
-                <a-select-option value="male">Male</a-select-option>
-                <a-select-option value="female">Female</a-select-option>
-                <a-select-option value="other">Other</a-select-option>
-              </a-select>
-            </a-form-item>
-  
-            <a-form-item label="Date of Birth" required>
-              <a-date-picker style="width: 100%" placeholder="Select Date" />
-            </a-form-item>
-  
-            <a-form-item label="Email" required>
-              <a-input placeholder="johndoe@example.com" disabled />
-            </a-form-item>
-  
-            <a-button type="primary" class="update-button">Update Profile</a-button>
-          </a-form>
-        </a-col>
-      </a-row>
-    </div>
-  </template>
-  
+      </div>
+
+      <!-- Profile Details -->
+      <a-col :span="16" class="profile-details">
+        <h3>Profile Details</h3>
+        <a-form
+          :layout="'vertical'"
+          class="details-form"
+          @submit.prevent="handleSubmit"
+        >
+          <a-form-item label="First Name" required>
+            <InputForm ref="firstNameInput" />
+          </a-form-item>
+
+          <a-form-item label="Last Name" required>
+            <InputForm ref="lastNameInput" />
+          </a-form-item>
+
+          <a-form-item label="Gender" required>
+            <a-select placeholder="Select Gender" v-model="gender">
+              <a-select-option value="male">Male</a-select-option>
+              <a-select-option value="female">Female</a-select-option>
+              <a-select-option value="other">Other</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <a-form-item label="Date of Birth" required>
+            <DatePickerForm ref="datePicker" />
+          </a-form-item>
+
+          <a-form-item label="Email" required>
+            <a-input placeholder="johndoe@example.com" disabled />
+          </a-form-item>
+
+          <a-button type="primary" class="update-button" htmlType="submit"
+            >Update Profile</a-button
+          >
+        </a-form>
+      </a-col>
+    </a-row>
+  </div>
+</template>
 
 <script setup>
+import { ref } from "vue";
+import InputForm from "@/components/InputForm.vue";
+import DatePickerForm from "@/components/DatePickerForm.vue";
+
 definePageMeta({
   layout: "default",
 });
@@ -66,6 +75,23 @@ const routes = [
     breadcrumbName: "Profile",
   },
 ];
+
+const gender = ref(null);
+
+const firstNameInput = ref(null);
+const lastNameInput = ref(null);
+const datePicker = ref(null);
+
+const handleSubmit = () => {
+  const firstName = firstNameInput.value?.inputData || "";
+  const lastName = lastNameInput.value?.inputData || "";
+  const dateOfBirth = datePicker.value?.selectedDate || "";
+
+  console.log("First Name:", firstName);
+  console.log("Last Name:", lastName);
+  console.log("Gender:", gender.value);
+  console.log("Date of Birth:", dateOfBirth);
+};
 </script>
 
 <style scoped>
@@ -118,4 +144,3 @@ const routes = [
   width: 100%;
 }
 </style>
-
