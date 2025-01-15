@@ -11,7 +11,10 @@
       <div class="left-section">
         <!-- Personal Details Section -->
         <section>
-          <h3>Personal Details</h3>
+          <div>
+            <h3>Personal Details</h3>
+            <p class="sub-title">Fill in your personal informations</p>
+          </div>
 
           <div class="flex-form-group">
             <InputForm ref="firstNameInput" label="First Name" required />
@@ -19,23 +22,49 @@
           </div>
 
           <InputForm ref="personalPositionInput" label="Position" />
-          <InputForm ref="personalSummaryInput" label="Summary" />
+          <!-- <InputForm ref="personalSummaryInput" label="Summary" /> -->
+
+          <a-form-item label="Summary">
+            <a-textarea
+              ref="personalSummaryInput"
+              rows="4"
+              placeholder="Write a brief summary about yourself"
+              v-model="personalSummary"
+            />
+          </a-form-item>
         </section>
 
         <!-- Contact Me Section -->
         <section>
-          <h3>Contact Me</h3>
+          <div>
+            <h3>Contact Me</h3>
+            <p class="sub-title">Write down your contact information.</p>
+          </div>
 
           <div class="flex-form-group">
             <InputForm ref="personalPhoneNumberInput" label="Phone Number" />
             <InputForm ref="personalEmailInput" label="Email" />
           </div>
-          <InputForm ref="personalAddressInput" label="Address" />
+          <!-- <InputForm ref="personalAddressInput" label="Address" /> -->
+
+          <a-form-item label="Address">
+            <a-textarea
+              ref="personalAddressInput"
+              rows="4"
+              placeholder="Current address"
+              v-model="personalSummary"
+            />
+          </a-form-item>
         </section>
 
         <!-- Reference Section -->
         <section>
-          <h3>Reference</h3>
+          <div>
+            <h3>Reference</h3>
+            <p class="sub-title">
+              Tell about the Reference person
+            </p>
+          </div>
 
           <div class="flex-form-group">
             <InputForm ref="refFirstNameInput" label="First Name" />

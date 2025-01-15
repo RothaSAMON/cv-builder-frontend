@@ -40,6 +40,12 @@ h3 {
   width: 100%;
   gap: 8px;
 }
+
 .w-full {
   width: 100%;
+}
+
+.sub-title {
+  font-size: 14px;
+  color: var(--sub-text-color);
 }
