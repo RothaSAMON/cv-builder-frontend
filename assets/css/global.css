@@ -1,15 +1,15 @@
 /* assets/css/global.css */
 :root {
-  --primary-color: #41BBFF;
+  --primary-color: #41bbff;
   --secondary-color: #ec930c;
 
   --text-color: #0f3871;
   --secondary-text-color: #000000;
-  --sub-text-color: #828ba2;
+  --sub-text-color: #8c8c8c;
 
   --error-color: #ff1e21;
-  --error-color-100: #FEF4F3;
-  --error-color-200: #F78CA2;
+  --error-color-100: #fef4f3;
+  --error-color-200: #f78ca2;
 
   --border-color: #ddd;
 
@@ -32,4 +32,14 @@ h1,
 h2,
 h3 {
   margin: 0;
+}
+
+.flex-form-group {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+.w-full {
+  width: 100%;
 }

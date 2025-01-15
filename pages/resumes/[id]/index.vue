@@ -6,28 +6,70 @@
       :breadcrumbRoutes="routes"
     />
 
-    <!-- First Reusable Form -->
-    <h2>Personal Information</h2>
-    <InputForm ref="personalInfoInput" />
+    <div class="split-screen">
+      <!-- Left Side -->
+      <div class="left-section">
+        <!-- Personal Details Section -->
+        <section>
+          <h3>Personal Details</h3>
 
-    <!-- Date Picker Forms -->
-    <h2>Date of Birth</h2>
-    <DatePickerForm ref="datePickerInput" />
+          <div class="flex-form-group">
+            <InputForm ref="firstNameInput" label="First Name" required />
+            <InputForm ref="lastNameInput" label="Last Name" required />
+          </div>
 
-    <h2>Start Date</h2>
-    <DatePickerForm ref="startDateInput" />
+          <InputForm ref="personalPositionInput" label="Position" />
+          <InputForm ref="personalSummaryInput" label="Summary" />
+        </section>
 
-    <h2>End Date</h2>
-    <DatePickerForm ref="endDateInput" />
+        <!-- Contact Me Section -->
+        <section>
+          <h3>Contact Me</h3>
 
-    <!-- Second Reusable Form -->
-    <h2>Job Experience</h2>
-    <InputForm ref="jobExperienceInput" />
+          <div class="flex-form-group">
+            <InputForm ref="personalPhoneNumberInput" label="Phone Number" />
+            <InputForm ref="personalEmailInput" label="Email" />
+          </div>
+          <InputForm ref="personalAddressInput" label="Address" />
+        </section>
 
-    <!-- Submit Button for All Forms -->
-    <a-button type="primary" @click="handleSubmit" class="mt-4">
-      Submit All Forms
-    </a-button>
+        <!-- Reference Section -->
+        <section>
+          <h3>Reference</h3>
+
+          <div class="flex-form-group">
+            <InputForm ref="refFirstNameInput" label="First Name" />
+            <InputForm ref="refLastNameInput" label="Last Name" />
+          </div>
+
+          <div class="flex-form-group">
+            <InputForm ref="refPositionInput" label="Position" />
+            <InputForm ref="refEmailInput" label="Email" />
+          </div>
+
+          <div class="flex-form-group">
+            <InputForm ref="refPhoneNumberInput" label="Phone Number" />
+            <InputForm ref="refCompanyInput" label="Company" />
+          </div>
+          <a-form-item label="Start Date">
+            <DatePickerForm ref="startDateInput" />
+          </a-form-item>
+        </section>
+
+        <!-- Submit Button -->
+        <div class="submit-container">
+          <a-button type="primary" @click="handleSubmit" class="submit-button">
+            Submit
+          </a-button>
+        </div>
+      </div>
+
+      <!-- Right Side -->
+      <div class="right-section">
+        <h3>Preview Resume</h3>
+        <!-- Add the content for preview -->
+      </div>
+    </div>
   </div>
 </template>
 
@@ -45,37 +87,108 @@ const routes = [
   { path: "/resumes/:id", breadcrumbName: "Resumes Action" },
 ];
 
-// Refs for all forms
-const personalInfoInput = ref(null);
-const jobExperienceInput = ref(null);
-const datePickerInput = ref(null);
+const firstNameInput = ref(null);
+const lastNameInput = ref(null);
+const personalPositionInput = ref(null);
+const personalSummaryInput = ref(null);
+const personalPhoneNumberInput = ref(null);
+const personalEmailInput = ref(null);
+const personalAddressInput = ref(null);
+const refFirstNameInput = ref(null);
+const refLastNameInput = ref(null);
+const refPositionInput = ref(null);
+const refEmailInput = ref(null);
+const refPhoneNumberInput = ref(null);
+const refCompanyInput = ref(null);
 const startDateInput = ref(null);
-const endDateInput = ref(null);
 
 const handleSubmit = () => {
-  console.log("Personal Information:", personalInfoInput.value?.inputData);
-  console.log("Date of Birth:", datePickerInput.value?.selectedDate);
+  console.log("First Name:", firstNameInput.value?.inputData);
+  console.log("Last Name:", lastNameInput.value?.inputData);
+  console.log("Position:", personalPositionInput.value?.inputData);
+  console.log("Summary:", personalSummaryInput.value?.inputData);
+  console.log("Phone Number:", personalPhoneNumberInput.value?.inputData);
+  console.log("Email:", personalEmailInput.value?.inputData);
+  console.log("Address:", personalAddressInput.value?.inputData);
+  console.log("Reference First Name:", refFirstNameInput.value?.inputData);
+  console.log("Reference Last Name:", refLastNameInput.value?.inputData);
+  console.log("Reference Position:", refPositionInput.value?.inputData);
+  console.log("Reference Email:", refEmailInput.value?.inputData);
+  console.log("Reference Phone Number:", refPhoneNumberInput.value?.inputData);
+  console.log("Reference Company:", refCompanyInput.value?.inputData);
   console.log("Start Date:", startDateInput.value?.selectedDate);
-  console.log("End Date:", endDateInput.value?.selectedDate);
-  console.log("Job Experience:", jobExperienceInput.value?.inputData);
 
-  // ✅ Clear all forms after submission
-  personalInfoInput.value.inputData = "";
-  jobExperienceInput.value.inputData = "";
-  datePickerInput.value.selectedDate = null;
+  // Clear inputs after submission
+  [
+    firstNameInput,
+    lastNameInput,
+    personalPositionInput,
+    personalSummaryInput,
+    personalPhoneNumberInput,
+    personalEmailInput,
+    personalAddressInput,
+    refFirstNameInput,
+    refLastNameInput,
+    refPositionInput,
+    refEmailInput,
+    refPhoneNumberInput,
+    refCompanyInput,
+  ].forEach((input) => (input.value.inputData = ""));
   startDateInput.value.selectedDate = null;
-  endDateInput.value.selectedDate = null;
 };
 </script>
 
 <style scoped>
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  padding: 20px;
 }
 
-.mt-4 {
-  margin-top: 1rem;
+.split-screen {
+  display: flex;
+  gap: 20px;
+  margin: 24px 0;
+}
+
+.left-section {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.left-section section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.right-section {
+  flex: 2;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  position: sticky;
+  top: 20px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.submit-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.submit-button {
+  width: 100%;
+}
+
+/* Add styles for form labels */
+::v-deep(.ant-form-item-label > label) {
+  color: var(--sub-text-color);
 }
 </style>

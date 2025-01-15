@@ -27,13 +27,11 @@
           class="details-form"
           @submit.prevent="handleSubmit"
         >
-          <a-form-item label="First Name" required>
-            <InputForm ref="firstNameInput" />
-          </a-form-item>
+          <section class="flex-form-group">
+            <InputForm ref="firstNameInput" label="First Name" />
 
-          <a-form-item label="Last Name" required>
-            <InputForm ref="lastNameInput" />
-          </a-form-item>
+            <InputForm ref="lastNameInput" label="Last Name" />
+          </section>
 
           <a-form-item label="Gender" required>
             <a-select placeholder="Select Gender" v-model="gender">
@@ -51,9 +49,9 @@
             <a-input placeholder="johndoe@example.com" disabled />
           </a-form-item>
 
-          <a-button type="primary" class="update-button" htmlType="submit"
-            >Update Profile</a-button
-          >
+          <a-button type="primary" class="update-button" htmlType="submit">
+            Update Profile
+          </a-button>
         </a-form>
       </a-col>
     </a-row>
@@ -142,5 +140,10 @@ const handleSubmit = () => {
 .update-button {
   margin-top: 20px;
   width: 100%;
+}
+
+/* Add styles for form labels */
+::v-deep(.ant-form-item-label > label) {
+  color: var(--sub-text-color);
 }
 </style>
