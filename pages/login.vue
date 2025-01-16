@@ -16,20 +16,20 @@
       </div>
     </section>
 
-    <a-form :layout="'vertical'" @submit.prevent="handleSubmit">
-      <InputForm
-        label="Username"
-        ref="username"
-        :rules="[{ required: true, message: 'Please input your username!' }]"
-      />
+    <!-- Form Section using Vee Validate and Zod -->
+    <a-form layout="vertical" @submit.prevent="onSubmit">
+      <!-- Username -->
+      <InputForm name="email" placeholder="example@gmail.com" label="Email" />
 
+      <!-- Password -->
       <InputForm
+        name="password"
+        placeholder="Password"
         label="Password"
         type="password"
-        ref="password"
-        :rules="[{ required: true, message: 'Please input your password!' }]"
       />
 
+      <!-- Submit Button -->
       <a-form-item>
         <a-button class="login-button" type="primary" html-type="submit" block>
           Login
@@ -46,22 +46,29 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import InputForm from "~/components/InputForm.vue";
+<script setup lang="ts">
+import { useForm } from "vee-validate";
+import { toFieldValidator } from "@vee-validate/zod";
+import * as z from "zod";
 
-const form = ref({
-  username: "",
-  password: "",
+// Define the Zod schema
+const schema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-const handleSubmit = () => {
-  console.log("Form submitted:", form.value);
-  // Add login logic here (e.g., API call)
-};
-</script>
+// Initialize Vee Validate with the schema
+const { handleSubmit } = useForm({
+  validationSchema: toFieldValidator(schema),
+});
 
-<script>
+// Handle form submission
+const onSubmit = handleSubmit((values) => {
+  console.log("Login successful with values:", values);
+  // Add login logic (e.g., API call)
+});
+
+// Page metadata
 definePageMeta({
   layout: "auth",
 });

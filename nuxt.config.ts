@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   // Add your plugin here
-  plugins: ["@/plugins/ant-design-vue.js"],
+  plugins: ["@/plugins/ant-design-vue.js", "@/plugins/vee-validate.ts"],
 
   // Add Ant Design styles here
   css: ["@/assets/css/global.css"],
@@ -13,6 +13,13 @@ export default defineNuxtConfig({
       tailwindcss: {},
       autoprefixer: {},
     },
+  },
+
+  build: {
+    transpile: ["vee-validate/dist/rules"],
+  },
+  typescript: {
+    strict: true,
   },
 
   modules: ["@nuxtjs/google-fonts", "@nuxt/icon", "@nuxt/image"],

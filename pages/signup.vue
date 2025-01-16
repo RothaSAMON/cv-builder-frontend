@@ -16,48 +16,51 @@
       </div>
     </section>
 
-    <a-form :layout="'vertical'" @submit.prevent="handleSubmit">
+    <!-- Form Section -->
+    <a-form layout="vertical" @submit.prevent="onSubmit">
       <div class="flex-form-group">
         <!-- First Name -->
-        <InputForm label="First Name" ref="firstName" required />
-
+        <InputForm
+          name="firstName"
+          placeholder="First Name"
+          label="First Name"
+        />
         <!-- Last Name -->
-        <InputForm label="Last Name" ref="lastName" required />
+        <InputForm name="lastName" placeholder="Last Name" label="Last Name" />
       </div>
 
       <div class="flex-form-group">
         <!-- Gender -->
-        <a-form-item label="Gender" required>
-          <a-select v-model="form.gender" placeholder="Select your gender">
+        <a-form-item
+          label="Gender"
+          :validate-status="genderError ? 'error' : ''"
+          :help="genderError"
+        >
+          <a-select v-model:value="gender" placeholder="Select your gender">
             <a-select-option value="male">Male</a-select-option>
             <a-select-option value="female">Female</a-select-option>
           </a-select>
         </a-form-item>
-
-        <!-- Date of Birth -->
-        <DatePickerForm
-          label="Date of Birth"
-          required
-          :rules="[
-            { required: true, message: 'Please select your date of birth!' },
-          ]"
-        />
       </div>
 
       <!-- Email -->
-      <InputForm label="Email" ref="email" required />
-
+      <InputForm name="email" placeholder="example@gmail.com" label="Email" />
       <!-- Password -->
-      <InputForm label="Password" ref="password" type="password" required />
-
+      <InputForm
+        name="password"
+        placeholder="Password"
+        label="Password"
+        type="password"
+      />
       <!-- Confirm Password -->
       <InputForm
+        name="confirmPassword"
+        placeholder="Confirm Password"
         label="Confirm Password"
-        ref="confirmPassword"
         type="password"
-        required
       />
 
+      <!-- Submit Button -->
       <a-form-item>
         <a-button class="login-button" type="primary" html-type="submit" block>
           Sign Up
@@ -71,38 +74,44 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { useForm, useField } from "vee-validate";
+import { toFieldValidator } from "@vee-validate/zod";
+import * as z from "zod";
+
+// Define schema with Zod
+const schema = z
+  .object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    gender: z.enum(["male", "female"], { message: "Gender is required" }),
+    email: z.string().email("Invalid email address"),
+    password: z
+      .string()
+      .min(8, "Password should be at least 8 characters long"),
+    confirmPassword: z.string().min(8, "Confirm Password is required"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+// Initialize the form
+const { handleSubmit, errors } = useForm({
+  validationSchema: toFieldValidator(schema),
+});
+
+// Use field for gender since it's not directly tied to an <InputForm>
+const { value: gender, errorMessage: genderError } = useField("gender");
+
+// Handle form submission
+const onSubmit = handleSubmit((formValues) => {
+  console.log("Form submitted successfully:", formValues);
+});
+
 definePageMeta({
   layout: "auth",
 });
-
-export default {
-  data() {
-    return {
-      form: {
-        gender: "",
-        dob: null,
-      },
-    };
-  },
-  methods: {
-    handleSubmit() {
-      const formData = {
-        firstName: this.$refs.firstName?.value,
-        lastName: this.$refs.lastName?.value,
-        email: this.$refs.email?.value,
-        password: this.$refs.password?.value,
-        confirmPassword: this.$refs.confirmPassword?.value,
-        gender: this.form.gender,
-        dob: this.form.dob,
-      };
-
-      console.log("Form submitted:", formData);
-
-      // Add your sign-up logic here (e.g., API call)
-    },
-  },
-};
 </script>
 
 <style scoped>

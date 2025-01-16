@@ -1,48 +1,47 @@
-<!-- <template>
-  <a-input
-    class="input-form"
-    v-model:value="inputData"
-    placeholder="Enter..."
-  />
-</template>
-
-<script setup>
-import { ref } from "vue";
-
-const inputData = ref("");
-//Expose inputData to the parent
-defineExpose({ inputData });
-</script>
-
-<style scoped>
-.input-form {
-  width: 100%;
-}
-</style> -->
-
 <template>
-  <a-form-item class="w-full" :label="label" :required="required">
-    <a-input class="w-full" v-model:value="inputData" placeholder="Enter..." />
+  <a-form-item
+    class="full-width"
+    :label="label"
+    :validate-status="validationStatus"
+    :help="error"
+  >
+    <a-input
+      class="full-width"
+      v-model="inputValue"
+      @input="handleInput"
+      :placeholder="placeholder"
+      @blur="handleBlur"
+    />
   </a-form-item>
 </template>
 
-<script setup>
-import { ref, defineProps } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
+import { useField } from "vee-validate";
 
-// Define props for label and required
-const props = defineProps({
-  label: {
-    type: String,
-    required: true,
-  },
-  required: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  name: string;
+  label: string;
+  placeholder?: string;
+}
+
+const props = defineProps<Props>();
+
+const {
+  value: inputValue,
+  errorMessage,
+  handleBlur,
+  setValue,
+} = useField(props.name);
+
+const error = computed(() => errorMessage.value);
+const validationStatus = computed(() => {
+  if (error.value) return "error";
+  return inputValue.value ? "success" : "";
 });
 
-const inputData = ref("");
-
-// Expose inputData to the parent component
-defineExpose({ inputData });
+const handleInput = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  setValue(target.value);
+};
 </script>
