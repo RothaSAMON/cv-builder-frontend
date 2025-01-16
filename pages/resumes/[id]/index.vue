@@ -7,83 +7,35 @@
     />
 
     <div class="split-screen">
-      <!-- Left Side -->
+      <!-- Left Section -->
       <div class="left-section">
-        <!-- Personal Details Section -->
-        <section>
-          <div>
-            <h3>Personal Details</h3>
-            <p class="sub-title">Fill in your personal informations</p>
+        <section class="templatep-container">
+          <h3>Select Template</h3>
+          <div class="template-selection">
+            <div
+              :class="[
+                'template-image',
+                { active: selectedTemplate === template1 },
+              ]"
+              @click="selectTemplate(template1)"
+            >
+              <img :src="template1" alt="Template 1" />
+            </div>
+            <div
+              :class="[
+                'template-image',
+                { active: selectedTemplate === template2 },
+              ]"
+              @click="selectTemplate(template2)"
+            >
+              <img :src="template2" alt="Template 2" />
+            </div>
           </div>
-
-          <div class="flex-form-group">
-            <InputForm ref="firstNameInput" label="First Name" required />
-            <InputForm ref="lastNameInput" label="Last Name" required />
-          </div>
-
-          <InputForm ref="personalPositionInput" label="Position" />
-          <!-- <InputForm ref="personalSummaryInput" label="Summary" /> -->
-
-          <a-form-item label="Summary">
-            <a-textarea
-              ref="personalSummaryInput"
-              rows="4"
-              placeholder="Write a brief summary about yourself"
-              v-model="personalSummary"
-            />
-          </a-form-item>
         </section>
 
-        <!-- Contact Me Section -->
-        <section>
-          <div>
-            <h3>Contact Me</h3>
-            <p class="sub-title">Write down your contact information.</p>
-          </div>
-
-          <div class="flex-form-group">
-            <InputForm ref="personalPhoneNumberInput" label="Phone Number" />
-            <InputForm ref="personalEmailInput" label="Email" />
-          </div>
-          <!-- <InputForm ref="personalAddressInput" label="Address" /> -->
-
-          <a-form-item label="Address">
-            <a-textarea
-              ref="personalAddressInput"
-              rows="4"
-              placeholder="Current address"
-              v-model="personalSummary"
-            />
-          </a-form-item>
-        </section>
-
-        <!-- Reference Section -->
-        <section>
-          <div>
-            <h3>Reference</h3>
-            <p class="sub-title">
-              Tell about the Reference person
-            </p>
-          </div>
-
-          <div class="flex-form-group">
-            <InputForm ref="refFirstNameInput" label="First Name" />
-            <InputForm ref="refLastNameInput" label="Last Name" />
-          </div>
-
-          <div class="flex-form-group">
-            <InputForm ref="refPositionInput" label="Position" />
-            <InputForm ref="refEmailInput" label="Email" />
-          </div>
-
-          <div class="flex-form-group">
-            <InputForm ref="refPhoneNumberInput" label="Phone Number" />
-            <InputForm ref="refCompanyInput" label="Company" />
-          </div>
-          <a-form-item label="Start Date">
-            <DatePickerForm ref="startDateInput" />
-          </a-form-item>
-        </section>
+        <DashboardPersonalDetailsForm />
+        <DashboardContactMeForm />
+        <DashboardReferenceForm />
 
         <!-- Submit Button -->
         <div class="submit-container">
@@ -93,85 +45,41 @@
         </div>
       </div>
 
-      <!-- Right Side -->
-      <div class="right-section">
-        <h3>Preview Resume</h3>
-        <!-- Add the content for preview -->
-      </div>
+      <!-- Right Section -->
+      <DashboardResume :selectedTemplate="selectedTemplate" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import InputForm from "~/components/InputForm.vue";
-import DatePickerForm from "~/components/DatePickerForm.vue";
-
-definePageMeta({
-  layout: "default",
-});
+import DashboardContactMeForm from "../../../components/dashboard/ContactMeForm.vue";
+import DashboardPersonalDetailsForm from "../../../components/dashboard/PersonalDetailsForm.vue";
+import DashboardReferenceForm from "../../../components/dashboard/ReferenceForm.vue";
+import DashboardResume from "../../../components/dashboard/Resume.vue";
 
 const routes = [
   { path: "/resumes", breadcrumbName: "Resumes" },
   { path: "/resumes/:id", breadcrumbName: "Resumes Action" },
 ];
 
-const firstNameInput = ref(null);
-const lastNameInput = ref(null);
-const personalPositionInput = ref(null);
-const personalSummaryInput = ref(null);
-const personalPhoneNumberInput = ref(null);
-const personalEmailInput = ref(null);
-const personalAddressInput = ref(null);
-const refFirstNameInput = ref(null);
-const refLastNameInput = ref(null);
-const refPositionInput = ref(null);
-const refEmailInput = ref(null);
-const refPhoneNumberInput = ref(null);
-const refCompanyInput = ref(null);
-const startDateInput = ref(null);
+const template1 =
+  "https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT.jpg";
+const template2 =
+  "https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT2.jpg";
+
+const selectedTemplate = ref(template1);
+
+const selectTemplate = (template) => {
+  selectedTemplate.value = template;
+};
 
 const handleSubmit = () => {
-  console.log("First Name:", firstNameInput.value?.inputData);
-  console.log("Last Name:", lastNameInput.value?.inputData);
-  console.log("Position:", personalPositionInput.value?.inputData);
-  console.log("Summary:", personalSummaryInput.value?.inputData);
-  console.log("Phone Number:", personalPhoneNumberInput.value?.inputData);
-  console.log("Email:", personalEmailInput.value?.inputData);
-  console.log("Address:", personalAddressInput.value?.inputData);
-  console.log("Reference First Name:", refFirstNameInput.value?.inputData);
-  console.log("Reference Last Name:", refLastNameInput.value?.inputData);
-  console.log("Reference Position:", refPositionInput.value?.inputData);
-  console.log("Reference Email:", refEmailInput.value?.inputData);
-  console.log("Reference Phone Number:", refPhoneNumberInput.value?.inputData);
-  console.log("Reference Company:", refCompanyInput.value?.inputData);
-  console.log("Start Date:", startDateInput.value?.selectedDate);
-
-  // Clear inputs after submission
-  [
-    firstNameInput,
-    lastNameInput,
-    personalPositionInput,
-    personalSummaryInput,
-    personalPhoneNumberInput,
-    personalEmailInput,
-    personalAddressInput,
-    refFirstNameInput,
-    refLastNameInput,
-    refPositionInput,
-    refEmailInput,
-    refPhoneNumberInput,
-    refCompanyInput,
-  ].forEach((input) => (input.value.inputData = ""));
-  startDateInput.value.selectedDate = null;
+  console.log("Form submitted");
 };
 </script>
 
 <style scoped>
-.container {
-  padding: 20px;
-}
-
 .split-screen {
   display: flex;
   gap: 20px;
@@ -189,22 +97,31 @@ const handleSubmit = () => {
   gap: 24px;
 }
 
-.left-section section {
+.template-selection {
   display: flex;
-  flex-direction: column;
   gap: 12px;
+  margin-bottom: 20px;
 }
 
-.right-section {
-  flex: 2;
-  background-color: #ffffff;
-  padding: 20px;
+.template-image {
+  width: 120px;
+  height: auto;
+  cursor: pointer;
+  border: 2px solid transparent;
   border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
   border: 1px solid var(--border-color);
-  position: sticky;
-  top: 20px;
-  height: 100vh;
-  overflow-y: auto;
+}
+
+.template-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.template-image.active {
+  border-color: #007bff;
 }
 
 .submit-container {
@@ -214,10 +131,5 @@ const handleSubmit = () => {
 
 .submit-button {
   width: 100%;
-}
-
-/* Add styles for form labels */
-::v-deep(.ant-form-item-label > label) {
-  color: var(--sub-text-color);
 }
 </style>
