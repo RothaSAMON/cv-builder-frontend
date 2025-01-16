@@ -6,7 +6,7 @@
     </div>
 
     <!-- Image Upload Section -->
-    <div>
+    <a-form layout="vertical" @submit.prevent="onSubmit">
       <a-form-item label="Upload Image">
         <a-upload
           name="avatar"
@@ -29,58 +29,67 @@
           </div>
         </a-upload>
       </a-form-item>
-    </div>
 
-    <div class="flex-form-group">
-      <InputForm ref="firstNameInput" label="First Name" required />
-      <InputForm ref="lastNameInput" label="Last Name" required />
-    </div>
-    <InputForm ref="personalPositionInput" label="Position" />
-    <a-form-item label="Summary">
-      <a-textarea
-        ref="personalSummaryInput"
-        rows="4"
-        placeholder="Write a brief summary about yourself"
-        v-model="personalSummary"
-      />
-    </a-form-item>
+      <div class="flex-form-group">
+        <InputForm name="firstName" placeholder="First Name" label="First Name" />
+        <InputForm name="lastName" placeholder="Last Name" label="Last Name" />
+      </div>
+      <InputForm name="personalPosition" placeholder="Position" label="Position" />
+      <a-form-item label="Summary">
+        <a-textarea
+          name="personalSummary"
+          rows="4"
+          placeholder="Write a brief summary about yourself"
+        />
+      </a-form-item>
+
+      <!-- Submit Button -->
+      <a-button type="primary" html-type="submit">Submit</a-button>
+    </a-form>
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { useForm } from "vee-validate";
+import { toFieldValidator } from "@vee-validate/zod";
+import * as z from "zod";
 import { ref } from "vue";
 import InputForm from "~/components/InputForm.vue";
 
-// State for personal summary and uploaded image URL
-const personalSummary = ref("");
-const imageUrl = ref(null);
+const schema = z.object({
+  firstName: z.string().min(1, "First Name is required"),
+  lastName: z.string().min(1, "Last Name is required"),
+  personalPosition: z.string().optional(),
+  personalSummary: z.string().optional(),
+});
 
-// Validate before uploading (e.g., size, file type)
-const beforeUpload = (file) => {
+const { handleSubmit } = useForm({
+  validationSchema: toFieldValidator(schema),
+});
+
+const imageUrl = ref<string | null>(null);
+
+const beforeUpload = (file: File) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    alert("You can only upload JPG/PNG files!");
-    return false;
-  }
   const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    alert("Image must be smaller than 2MB!");
-    return false;
-  }
+
+  if (!isJpgOrPng) alert("You can only upload JPG/PNG files!");
+  if (!isLt2M) alert("Image must be smaller than 2MB!");
+
   return isJpgOrPng && isLt2M;
 };
 
-// Handle image change
-const handleChange = (info) => {
-  if (info.file.status === "done") {
-    // Simulate getting the URL from a server
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageUrl.value = e.target.result;
-    };
-    reader.readAsDataURL(info.file.originFileObj);
-  }
+const handleChange = (info: any) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imageUrl.value = e.target?.result as string;
+  };
+  reader.readAsDataURL(info.file.originFileObj);
 };
+
+const onSubmit = handleSubmit((values) => {
+  console.log("Form submitted with values:", values);
+});
 </script>
 
 <style scoped>

@@ -36,6 +36,10 @@
         <DashboardPersonalDetailsForm />
         <DashboardContactMeForm />
         <DashboardReferenceForm />
+        <DashboardSkillsForm />
+        <DashboardExperienceForm />
+        <DashboardEducationForm />
+        <DashboardLanguagueForm />
 
         <!-- Submit Button -->
         <div class="submit-container">
