@@ -17,24 +17,18 @@
     </section>
 
     <a-form :layout="'vertical'" @submit.prevent="handleSubmit">
-      <a-form-item
-        name="username"
+      <InputForm
         label="Username"
-        rules="[ { required: true, message: 'Please input your username!' } ]"
-      >
-        <a-input v-model="form.username" placeholder="Enter your username" />
-      </a-form-item>
+        ref="username"
+        :rules="[{ required: true, message: 'Please input your username!' }]"
+      />
 
-      <a-form-item
-        name="password"
+      <InputForm
         label="Password"
-        rules="[ { required: true, message: 'Please input your password!' } ]"
-      >
-        <a-input-password
-          v-model="form.password"
-          placeholder="Enter your password"
-        />
-      </a-form-item>
+        type="password"
+        ref="password"
+        :rules="[{ required: true, message: 'Please input your password!' }]"
+      />
 
       <a-form-item>
         <a-button class="login-button" type="primary" html-type="submit" block>
@@ -44,32 +38,33 @@
     </a-form>
 
     <section class="ask-signup">
-      <p>Don't have an account? <NuxtLink class="signup-link" to="/signup">Sign Up</NuxtLink></p>
+      <p>
+        Don't have an account?
+        <NuxtLink class="signup-link" to="/signup">Sign Up</NuxtLink>
+      </p>
     </section>
   </div>
 </template>
+
+<script setup>
+import { ref } from "vue";
+import InputForm from "~/components/InputForm.vue";
+
+const form = ref({
+  username: "",
+  password: "",
+});
+
+const handleSubmit = () => {
+  console.log("Form submitted:", form.value);
+  // Add login logic here (e.g., API call)
+};
+</script>
 
 <script>
 definePageMeta({
   layout: "auth",
 });
-
-export default {
-  data() {
-    return {
-      form: {
-        username: "",
-        password: "",
-      },
-    };
-  },
-  methods: {
-    handleSubmit() {
-      console.log("Form submitted:", this.form);
-      // Add login logic here (e.g., API call)
-    },
-  },
-};
 </script>
 
 <style scoped>

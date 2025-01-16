@@ -17,43 +17,46 @@
     </section>
 
     <a-form :layout="'vertical'" @submit.prevent="handleSubmit">
-      <a-form-item
-        name="username"
-        label="Username"
-        rules="[ { required: true, message: 'Please input your username!' } ]"
-      >
-        <a-input v-model="form.username" placeholder="Enter your username" />
-      </a-form-item>
+      <div class="flex-form-group">
+        <!-- First Name -->
+        <InputForm label="First Name" ref="firstName" required />
 
-      <a-form-item
-        name="email"
-        label="Email"
-        rules="[ { required: true, message: 'Please input your Email!' } ]"
-      >
-        <a-input v-model="form.username" placeholder="Enter your username" />
-      </a-form-item>
+        <!-- Last Name -->
+        <InputForm label="Last Name" ref="lastName" required />
+      </div>
 
-      <a-form-item
-        name="password"
-        label="Password"
-        rules="[ { required: true, message: 'Please input your password!' } ]"
-      >
-        <a-input-password
-          v-model="form.password"
-          placeholder="Enter your password"
+      <div class="flex-form-group">
+        <!-- Gender -->
+        <a-form-item label="Gender" required>
+          <a-select v-model="form.gender" placeholder="Select your gender">
+            <a-select-option value="male">Male</a-select-option>
+            <a-select-option value="female">Female</a-select-option>
+          </a-select>
+        </a-form-item>
+
+        <!-- Date of Birth -->
+        <DatePickerForm
+          label="Date of Birth"
+          required
+          :rules="[
+            { required: true, message: 'Please select your date of birth!' },
+          ]"
         />
-      </a-form-item>
+      </div>
 
-      <a-form-item
-        name="confirmPassword"
+      <!-- Email -->
+      <InputForm label="Email" ref="email" required />
+
+      <!-- Password -->
+      <InputForm label="Password" ref="password" type="password" required />
+
+      <!-- Confirm Password -->
+      <InputForm
         label="Confirm Password"
-        rules="[ { required: true, message: 'Please input your confirm password!' } ]"
-      >
-        <a-input-password
-          v-model="form.password"
-          placeholder="Enter your password"
-        />
-      </a-form-item>
+        ref="confirmPassword"
+        type="password"
+        required
+      />
 
       <a-form-item>
         <a-button class="login-button" type="primary" html-type="submit" block>
@@ -77,15 +80,26 @@ export default {
   data() {
     return {
       form: {
-        username: "",
-        password: "",
+        gender: "",
+        dob: null,
       },
     };
   },
   methods: {
     handleSubmit() {
-      console.log("Form submitted:", this.form);
-      // Add login logic here (e.g., API call)
+      const formData = {
+        firstName: this.$refs.firstName?.value,
+        lastName: this.$refs.lastName?.value,
+        email: this.$refs.email?.value,
+        password: this.$refs.password?.value,
+        confirmPassword: this.$refs.confirmPassword?.value,
+        gender: this.form.gender,
+        dob: this.form.dob,
+      };
+
+      console.log("Form submitted:", formData);
+
+      // Add your sign-up logic here (e.g., API call)
     },
   },
 };
