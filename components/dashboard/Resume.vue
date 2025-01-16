@@ -16,71 +16,94 @@
         <h3 class="title-section">{{ dummyData.jobTitle }}</h3>
       </section>
 
-      <section class="summary-section">
-        <h3 class="section-title">About</h3>
-        <p>{{ dummyData.about }}</p>
-      </section>
+      <div class="content-container">
+        <!-- The left side of Resume -->
+        <section class="left-container">
+          <section class="contact-section">
+            <h3 class="section-title">Contact Me</h3>
+            <p>{{ dummyData.phoneNumber }}</p>
+            <p>{{ dummyData.email }}</p>
+            <p>{{ dummyData.address }}</p>
+            <hr />
+          </section>
 
-      <section class="contact-section">
-        <h3 class="section-title">Contact Me</h3>
-        <p>{{ dummyData.phoneNumber }}</p>
-        <p>{{ dummyData.email }}</p>
-        <p>{{ dummyData.address }}</p>
-      </section>
+          <section class="skills-section">
+            <h3 class="section-title">Skills</h3>
+            <ul>
+              <li v-for="(skill, index) in dummyData.skills" :key="index">
+                <span class="skill-name">{{ skill.name }}</span> :
+                <span class="skill-level">{{ skill.level }}</span>
+              </li>
+            </ul>
+            <hr />
+          </section>
 
-      <section class="skills-section">
-        <h3 class="section-title">Skills</h3>
-        <ul>
-          <li v-for="(skill, index) in dummyData.skills" :key="index">
-            <span class="skill-name">{{ skill.name }}</span> :
-            <span class="skill-level">{{ skill.level }}</span>
-          </li>
-        </ul>
-      </section>
+          <section class="languages-section">
+            <h3 class="section-title">Language</h3>
+            <ul>
+              <li v-for="(language, index) in dummyData.languages" :key="index">
+                <span class="language-name">{{ language.name }}</span> :
+                <span class="language-level">{{ language.level }}</span>
+              </li>
+            </ul>
+            <hr />
+          </section>
 
-      <section class="languages-section">
-        <h3 class="section-title">Language</h3>
-        <ul>
-          <li v-for="(language, index) in dummyData.languages" :key="index">
-            <span class="language-name">{{ language.name }}</span> :
-            <span class="language-level">{{ language.level }}</span>
-          </li>
-        </ul>
-      </section>
+          <section class="reference-section">
+            <h3 class="section-title">Reference</h3>
 
-      <section class="reference-section">
-        <h3 class="section-title">Reference</h3>
+            <div
+              v-for="(reference, index) in dummyData.references"
+              :key="index"
+            >
+              <p>{{ reference.firstName }} {{ reference.lastName }}</p>
+              <p>{{ reference.company }}</p>
+              <p>{{ reference.position }}</p>
+              <p>{{ reference.email }}</p>
+              <p>{{ reference.phoneNumber }}</p>
+              <br />
+            </div>
+          </section>
+        </section>
 
-        <div v-for="(reference, index) in dummyData.references" :key="index">
-          <p>{{ reference.firstName }} {{ reference.lastName }}</p>
-          <p>{{ reference.company }}</p>
-          <p>{{ reference.position }}</p>
-          <p>{{ reference.email }}</p>
-          <p>{{ reference.phoneNumber }}</p>
-        </div>
-      </section>
+        <!-- The right side of Resume -->
+        <section class="right-container">
+          <section class="summary-section">
+            <h3 class="section-title">About</h3>
+            <p>{{ dummyData.about }}</p>
+            <hr>
+          </section>
 
-      <section class="experiences-section">
-        <h3 class="section-title">Experience</h3>
+          <section class="experiences-section">
+            <h3 class="section-title">Experience</h3>
 
-        <div v-for="(experience, index) in dummyData.experiences" :key="index">
-          <p>{{ experience.jobTitle }}</p>
-          <p>{{ experience.position }}</p>
-          <p>{{ experience.startDate }}</p>
-          <p>{{ experience.endDate }}</p>
-        </div>
-      </section>
+            <div
+              v-for="(experience, index) in dummyData.experiences"
+              :key="index"
+            >
+              <p>{{ experience.jobTitle }}</p>
+              <p>{{ experience.position }}</p>
+              <p>{{ experience.startDate }} - {{ experience.endDate }}</p>
+              <br />
+            </div>
+            <hr />
+          </section>
 
-      <section class="educations-section">
-        <h3 class="section-title">Education</h3>
+          <section class="educations-section">
+            <h3 class="section-title">Education</h3>
 
-        <div v-for="(education, index) in dummyData.educations" :key="index">
-          <p>{{ education.schoolName }}</p>
-          <p>{{ education.degreeMajor }}</p>
-          <p>{{ education.startDate }}</p>
-          <p>{{ education.endDate }}</p>
-        </div>
-      </section>
+            <div
+              v-for="(education, index) in dummyData.educations"
+              :key="index"
+            >
+              <p>{{ education.schoolName }}</p>
+              <p>{{ education.degreeMajor }}</p>
+              <p>{{ education.startDate }} - {{ education.endDate }}</p>
+              <br />
+            </div>
+          </section>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -119,11 +142,18 @@ const dummyData = reactive({
     { name: "JavaScript", level: "Expert" },
     { name: "Vue.js", level: "Advanced" },
     { name: "Node.js", level: "Intermediate" },
+    { name: "HTML", level: "Expert" },
+    { name: "CSS", level: "Advanced" },
+    { name: "JavaScript", level: "Expert" },
+    { name: "Vue.js", level: "Advanced" },
+    { name: "Node.js", level: "Intermediate" },
   ],
 
   languages: [
     { name: "Khmer", level: "Native" },
     { name: "English", level: "Advanced" },
+    { name: "Japanese", level: "Advanced" },
+    { name: "Spanish", level: "Advanced" },
   ],
 
   references: [
@@ -135,9 +165,29 @@ const dummyData = reactive({
       email: "example@gmail.com",
       phoneNumber: "+855 72 983 293",
     },
+    {
+      firstName: "Samon",
+      lastName: "Rotha",
+      position: "Codinator",
+      company: "Co Ltd",
+      email: "example@gmail.com",
+      phoneNumber: "+855 72 983 293",
+    },
   ],
 
   experiences: [
+    {
+      jobTitle: "IT Game - SEAGAME 32nd",
+      position: "IT Game Admin",
+      startDate: "23-11-2023",
+      endDate: "23-12-2023",
+    },
+    {
+      jobTitle: "IT Game - SEAGAME 32nd",
+      position: "IT Game Admin",
+      startDate: "23-11-2023",
+      endDate: "23-12-2023",
+    },
     {
       jobTitle: "IT Game - SEAGAME 32nd",
       position: "IT Game Admin",
@@ -232,70 +282,23 @@ const dummyData = reactive({
   margin-top: 20px;
 }
 
-.summary-section {
-  margin-left: 250px;
-  margin-top: 44px;
-  color: var(--secondary-text-color);
-}
-
-.section-title {
+.content-container {
+  display: flex;
+  gap: 36px;
+  padding: 56px 0;
   color: var(--text-color);
-  font-weight: 700;
-  margin: 4px 0;
 }
 
-.contact-section {
-  position: absolute;
-  top: 180px;
-  color: var(--secondary-text-color);
-  max-width: 220px;
-}
-.contact-section p {
-  margin: 4px 0;
+.left-container {
+  width: 460px;
 }
 
-.skills-section {
-  position: absolute;
-  top: 300px;
-  color: var(--secondary-text-color);
-  max-width: 220px;
-}
+/* .right-container {
+} */
 
-.languages-section {
-  position: absolute;
-  top: 480px;
-  color: var(--secondary-text-color);
-  max-width: 220px;
-}
-
-.reference-section {
-  position: absolute;
-  top: 600px;
-  color: var(--secondary-text-color);
-  max-width: 220px;
-}
-.reference-section p {
-  margin: 4px 0;
-}
-.experiences-section {
-  position: absolute;
-  top: 300px;
-  left: 270px;
-  color: var(--secondary-text-color);
-  max-width: 220px;
-}
+.educations-section p,
+.reference-section p,
 .experiences-section p {
-  margin: 4px 0;
-}
-
-.educations-section {
-  position: absolute;
-  top: 600px;
-  left: 270px;
-  color: var(--secondary-text-color);
-  max-width: 220px;
-}
-.educations-section p {
   margin: 4px 0;
 }
 
