@@ -6,57 +6,88 @@
       :breadcrumbRoutes="routes"
     />
 
-    <div class="split-screen">
-      <!-- Left Section -->
-      <div class="left-section">
-        <section class="templatep-container">
-          <h3>Select Template</h3>
-          <div class="template-selection">
-            <div
-              :class="[
-                'template-image',
-                { active: selectedTemplate === template1 },
-              ]"
-              @click="selectTemplate(template1)"
-            >
-              <img :src="template1" alt="Template 1" />
+    <!-- Loading and Error States -->
+    <div v-if="isLoading" class="loading-state">Loading...</div>
+    <div v-else-if="isError" class="error-state">Failed to load CV data.</div>
+    <div v-else>
+      <div class="split-screen">
+        <!-- Left Section -->
+        <div class="left-section">
+          <section class="templatep-container">
+            <h3>Select Template</h3>
+            <div class="template-selection">
+              <div
+                :class="[
+                  'template-image',
+                  { active: selectedTemplate === template1 },
+                ]"
+                @click="selectTemplate(template1)"
+              >
+                <img :src="template1" alt="Template 1" />
+              </div>
+              <div
+                :class="[
+                  'template-image',
+                  { active: selectedTemplate === template2 },
+                ]"
+                @click="selectTemplate(template2)"
+              >
+                <img :src="template2" alt="Template 2" />
+              </div>
             </div>
-            <div
-              :class="[
-                'template-image',
-                { active: selectedTemplate === template2 },
-              ]"
-              @click="selectTemplate(template2)"
-            >
-              <img :src="template2" alt="Template 2" />
-            </div>
+          </section>
+
+          <!-- Display CV Data -->
+          <div>
+            <h4>CV Details</h4>
+            <p><strong>First Name:</strong> {{ cvData?.userId?.firstName }}</p>
+            <p><strong>Last Name:</strong> {{ cvData?.userId?.lastName }}</p>
+            <p><strong>Email:</strong> {{ cvData?.userId?.email }}</p>
+            <p>
+              <strong>Date of Birth:</strong> {{ cvData?.userId?.dateOfBirth }}
+            </p>
+            <p><strong>Title:</strong> {{ cvData?.title }}</p>
           </div>
-        </section>
 
-        <DashboardPersonalDetailsForm />
-        <DashboardContactMeForm />
-        <DashboardReferenceForm />
-        <DashboardSkillsForm />
-        <DashboardExperienceForm />
-        <DashboardEducationForm />
-        <DashboardLanguagueForm />
+          <!-- Display CV Data -->
+          <DashboardPersonalDetailsForm
+            :firstName="cvData?.firstName"
+            :lastName="cvData?.lastName"
+            :dateOfBirth="cvData?.dateOfBirth"
+          />
+          <DashboardContactMeForm :email="cvData?.email" />
+          <DashboardReferenceForm :references="cvData?.references" />
+          <DashboardSkillsForm :skills="cvData?.skills" />
+          <DashboardExperienceForm :experience="cvData?.experience" />
+          <DashboardEducationForm :education="cvData?.education" />
+          <DashboardLanguagueForm :languages="cvData?.languages" />
 
-        <!-- Submit Button -->
-        <div class="submit-container">
-          <a-button type="primary" @click="handleSubmit" class="submit-button">
-            Submit
-          </a-button>
+          <!-- Submit Button -->
+          <div class="submit-container">
+            <a-button
+              type="primary"
+              @click="handleSubmit"
+              class="submit-button"
+            >
+              Submit
+            </a-button>
+          </div>
         </div>
-      </div>
 
-      <!-- Right Section -->
-      <DashboardResume :selectedTemplate="selectedTemplate" />
+        <!-- Right Section -->
+        <DashboardResume
+          :selectedTemplate="selectedTemplate"
+          :cvData="cvData"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watchEffect } from "vue";
+import { useRoute } from "vue-router";
+// import { useCV } from "~/composables/useCV";
 import DashboardContactMeForm from "../../../components/dashboard/ContactMeForm.vue";
 import DashboardPersonalDetailsForm from "../../../components/dashboard/PersonalDetailsForm.vue";
 import DashboardReferenceForm from "../../../components/dashboard/ReferenceForm.vue";
@@ -67,6 +98,7 @@ const routes = [
   { path: "/resumes/:id", breadcrumbName: "Resumes Action" },
 ];
 
+// Template selection
 const template1 =
   "https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT.jpg";
 const template2 =
@@ -78,8 +110,21 @@ const selectTemplate = (template) => {
   selectedTemplate.value = template;
 };
 
+// Route and CV Data Fetching
+const route = useRoute();
+const { fetchCVById } = useCV();
+const cvId = computed(() => route.params.id);
+
+const { data: cvData, isLoading, isError } = fetchCVById(cvId.value);
+
+// Log data whenever it changes
+watchEffect(() => {
+  console.log("Fetched CV Data:", cvData.value);
+});
+
+// Handle form submission
 const handleSubmit = () => {
-  console.log("Form submitted");
+  console.log("Form submitted with data:", cvData.value);
 };
 </script>
 

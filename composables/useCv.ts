@@ -29,5 +29,15 @@ export const useCV = () => {
       enabled: !!userId, // Only fetch if userId is provided
     });
 
-  return { cvQueryAll, fetchCVsByUserId };
+  const fetchCVById = (cvId: string) =>
+    useQuery({
+      queryKey: ["cv", cvId],
+      queryFn: async () => {
+        const response = await axios.get<CVType>(`${baseURL}/cvs/${cvId}`);
+        return response.data;
+      },
+      enabled: !!cvId, // Only fetch if cvId is provided
+    });
+
+  return { cvQueryAll, fetchCVsByUserId, fetchCVById };
 };

@@ -17,7 +17,12 @@
     <!-- Resume Cards -->
     <a-row :gutter="16">
       <!-- Dynamically render fetched resumes -->
-      <a-col v-for="resume in paginatedResumes" :key="resume._id" :span="8">
+      <a-col
+        v-for="resume in paginatedResumes"
+        :key="resume._id"
+        :span="8"
+        @click="goToResume(resume._id)"
+      >
         <a-card :hoverable="true">
           <a-row align="middle" justify="center">
             <!-- Resume Preview Image -->
@@ -58,6 +63,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { PlusOutlined } from "@ant-design/icons-vue";
+import { useRouter } from "vue-router";
 
 // Props
 defineProps({
@@ -68,6 +74,7 @@ defineProps({
 });
 
 const { cvQueryAll } = useCV();
+const router = useRouter();
 
 // Fetch data from API
 const cvData = computed(() => cvQueryAll.data.value || []);
@@ -85,6 +92,11 @@ const paginatedResumes = computed(() => {
 // Change page
 const onPageChange = (page: number) => {
   currentPage.value = page;
+};
+
+// Navigate to specific resume detail page
+const goToResume = (resumeId: string) => {
+  router.push(`/resumes/${resumeId}`);
 };
 
 // Handle Create button
