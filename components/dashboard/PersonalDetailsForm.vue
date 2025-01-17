@@ -5,8 +5,8 @@
       <p class="sub-title">Fill in your personal information</p>
     </div>
 
-    <!-- Image Upload Section -->
     <a-form layout="vertical" @submit.prevent="onSubmit">
+      <!-- Image Upload Section -->
       <a-form-item label="Upload Image">
         <a-upload
           name="avatar"
@@ -30,27 +30,33 @@
         </a-upload>
       </a-form-item>
 
+      <!-- Form Fields -->
       <div class="flex-form-group">
         <InputForm
+        :initial-value="props.firstName"
           name="firstName"
-          placeholder="First Name"
           label="First Name"
+          placeholder="Enter your first name"
         />
-        <InputForm name="lastName" placeholder="Last Name" label="Last Name" />
+        <InputForm :initial-value="props.lastName" name="lastName" placeholder="Last Name" label="Last Name" />
       </div>
       <InputForm
+        :initial-value="props.personalPosition"
         name="personalPosition"
         placeholder="Position"
         label="Position"
       />
-      <a-form-item label="Summary">
-        <Field
+      <a-form-item
+        label="Summary"
+        :validate-status="errors.personalSummary ? 'error' : ''"
+        :help="errors.personalSummary"
+      >
+        <a-textarea
+          v-model="values.personalSummary"
           name="personalSummary"
-          as="a-textarea"
-          :rows="4"
+          rows="4"
           placeholder="Write a brief summary about yourself"
         />
-        <ErrorMessage name="personalSummary" class="error-message" />
       </a-form-item>
 
       <!-- Submit Button -->
@@ -59,13 +65,23 @@
   </section>
 </template>
 
-<script setup lang="ts">
-import { useForm, Field, ErrorMessage } from "vee-validate";
+<script lang="ts" setup>
+import { ref } from "vue";
+import { useForm, defineRule } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
 import * as z from "zod";
-import { ref } from "vue";
 import InputForm from "~/components/InputForm.vue";
 
+// Props Definition
+interface DashboardPersonalDetailsFormProps {
+  firstName?: string;
+  lastName?: string;
+  personalPosition?: string;
+  personalSummary?: string;
+}
+const props = defineProps<DashboardPersonalDetailsFormProps>();
+
+// Zod Schema
 const schema = z.object({
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
@@ -73,10 +89,13 @@ const schema = z.object({
   personalSummary: z.string().optional(),
 });
 
-const { handleSubmit } = useForm({
+// Initialize Form
+const { handleSubmit, values, errors } = useForm({
   validationSchema: toFieldValidator(schema),
+  
 });
 
+// Image Upload Logic
 const imageUrl = ref<string | null>(null);
 
 const beforeUpload = (file: File) => {
@@ -97,6 +116,7 @@ const handleChange = (info: any) => {
   reader.readAsDataURL(info.file.originFileObj);
 };
 
+// Form Submission
 const onSubmit = handleSubmit((values) => {
   console.log("Form submitted with values:", values);
 });
@@ -115,10 +135,5 @@ const onSubmit = handleSubmit((values) => {
 
 .upload-container {
   margin-bottom: 16px;
-}
-
-.error-message {
-  color: red;
-  font-size: 0.9rem;
 }
 </style>
