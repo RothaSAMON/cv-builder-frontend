@@ -34,29 +34,27 @@
         </div>
 
         <div>
-          <a-form-item label="Start Date">
-            <Field
-              :name="`fields.${index}.startDate`"
-              as="a-input"
-              placeholder="Start Date"
-            />
-            <ErrorMessage
-              :name="`fields.${index}.startDate`"
-              class="error-message"
-            />
-          </a-form-item>
+          <!-- Start Date -->
+          <DatePickerForm
+            :name="`fields.${index}.startDate`"
+            label="Start Date"
+            placeholder="Select start date"
+          />
+          <ErrorMessage
+            :name="`fields.${index}.startDate`"
+            class="error-message"
+          />
 
-          <a-form-item label="End Date">
-            <Field
-              :name="`fields.${index}.endDate`"
-              as="a-input"
-              placeholder="End Date"
-            />
-            <ErrorMessage
-              :name="`fields.${index}.endDate`"
-              class="error-message"
-            />
-          </a-form-item>
+          <!-- End Date -->
+          <DatePickerForm
+            :name="`fields.${index}.endDate`"
+            label="End Date"
+            placeholder="Select end date"
+          />
+          <ErrorMessage
+            :name="`fields.${index}.endDate`"
+            class="error-message"
+          />
         </div>
 
         <a-button
@@ -84,6 +82,7 @@ import { useFieldArray, useForm, Field, ErrorMessage } from "vee-validate";
 import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
+import DatePickerForm from "@/components/DatePickerForm.vue"; // Import the DatePickerForm
 
 // Define the validation schema
 const ExperienceSchema = z.object({

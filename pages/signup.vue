@@ -32,6 +32,7 @@
       <div class="flex-form-group">
         <!-- Gender -->
         <a-form-item
+          class="w-full"
           label="Gender"
           :validate-status="genderError ? 'error' : ''"
           :help="genderError"
@@ -41,6 +42,13 @@
             <a-select-option value="female">Female</a-select-option>
           </a-select>
         </a-form-item>
+
+        <!-- Date of Birth -->
+        <DatePickerForm
+          name="dateOfBirth"
+          label="Date of Birth"
+          placeholder="Select your date of birth"
+        />
       </div>
 
       <!-- Email -->
@@ -78,6 +86,8 @@
 import { useForm, useField } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
 import * as z from "zod";
+import InputForm from "@/components/InputForm.vue";
+import DatePickerForm from "@/components/DatePickerForm.vue";
 
 // Define schema with Zod
 const schema = z
@@ -85,6 +95,7 @@ const schema = z
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     gender: z.enum(["male", "female"], { message: "Gender is required" }),
+    dateOfBirth: z.string().min(1, "Date of Birth is required"),
     email: z.string().email("Invalid email address"),
     password: z
       .string()

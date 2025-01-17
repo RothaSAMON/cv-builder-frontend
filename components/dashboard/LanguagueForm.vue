@@ -7,7 +7,8 @@
 
     <a-form @submit.prevent="onSubmit" layout="vertical">
       <div v-for="(field, index) in fields" :key="index" class="form-row">
-        <a-form-item label="Language">
+        <!-- Language Field -->
+        <a-form-item class="w-full" label="Language">
           <Field
             :name="`fields.${index}.language`"
             as="a-input"
@@ -19,15 +20,22 @@
           />
         </a-form-item>
 
-        <a-form-item label="Level">
+        <!-- Level Select Field -->
+        <a-form-item class="w-full" label="Level">
           <Field
             :name="`fields.${index}.level`"
-            as="a-input"
-            placeholder="Level"
-          />
+            as="a-select"
+            placeholder="Select Level"
+          >
+            <a-select-option value="Beginner">Beginner</a-select-option>
+            <a-select-option value="Intermediate">Intermediate</a-select-option>
+            <a-select-option value="Advanced">Advanced</a-select-option>
+            <a-select-option value="Fluent">Fluent</a-select-option>
+          </Field>
           <ErrorMessage :name="`fields.${index}.level`" class="error-message" />
         </a-form-item>
 
+        <!-- Remove Field Button -->
         <a-button
           type="link"
           @click="removeField(index)"
@@ -37,10 +45,12 @@
         </a-button>
       </div>
 
+      <!-- Add Language Button -->
       <a-button type="dashed" block @click="addField">
         <span>+ Add Language</span>
       </a-button>
 
+      <!-- Submit Button -->
       <a-button type="primary" html-type="submit" class="submit-btn">
         Submit
       </a-button>
@@ -57,7 +67,7 @@ import { DeleteOutlined } from "@ant-design/icons-vue";
 // Define the validation schema
 const LanguageSchema = z.object({
   language: z.string().min(1, "Language is required"),
-  level: z.string().min(1, "Level is required"),
+  level: z.string().min(1, "Level is required"), // Validate that level is selected
 });
 
 const FormSchema = z.object({

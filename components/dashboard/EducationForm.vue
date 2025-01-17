@@ -35,29 +35,27 @@
           </div>
 
           <div class="form-row">
-            <a-form-item label="Start Date">
-              <Field
-                :name="`fields.${index}.startDate`"
-                as="a-input"
-                placeholder="Start Date"
-              />
-              <ErrorMessage
-                :name="`fields.${index}.startDate`"
-                class="error-message"
-              />
-            </a-form-item>
+            <!-- Start Date -->
+            <DatePickerForm
+              :name="`fields.${index}.startDate`"
+              label="Start Date"
+              placeholder="Select start date"
+            />
+            <ErrorMessage
+              :name="`fields.${index}.startDate`"
+              class="error-message"
+            />
 
-            <a-form-item label="End Date">
-              <Field
-                :name="`fields.${index}.endDate`"
-                as="a-input"
-                placeholder="End Date"
-              />
-              <ErrorMessage
-                :name="`fields.${index}.endDate`"
-                class="error-message"
-              />
-            </a-form-item>
+            <!-- End Date -->
+            <DatePickerForm
+              :name="`fields.${index}.endDate`"
+              label="End Date"
+              placeholder="Select end date"
+            />
+            <ErrorMessage
+              :name="`fields.${index}.endDate`"
+              class="error-message"
+            />
           </div>
         </section>
 
@@ -86,6 +84,7 @@ import { useFieldArray, useForm, Field, ErrorMessage } from "vee-validate";
 import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
+import DatePickerForm from "../../components/DatePickerForm.vue";
 
 // Define the validation schema
 const EducationSchema = z.object({
@@ -99,7 +98,7 @@ const FormSchema = z.object({
   fields: z.array(EducationSchema),
 });
 
-const { handleSubmit, values } = useForm({
+const { handleSubmit, values, resetForm } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
     fields: [
@@ -125,6 +124,20 @@ const removeField = (index: number) => {
 
 const onSubmit = handleSubmit((data) => {
   console.log("Submitted data:", data);
+
+  // Clear form after successful submission
+  resetForm({
+    values: {
+      fields: [
+        {
+          schoolName: "",
+          degreeMajor: "",
+          startDate: "",
+          endDate: "",
+        },
+      ],
+    },
+  });
 });
 </script>
 

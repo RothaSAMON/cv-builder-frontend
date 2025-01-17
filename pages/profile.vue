@@ -25,7 +25,6 @@
             @change="handleFileChange"
           />
         </div>
-
         <div>
           <h3>Samon Rotha</h3>
           <p class="sub-title">samonrotha@gmail.com</p>
@@ -39,27 +38,54 @@
       <a-col class="profile-details">
         <h3>Profile Details</h3>
         <a-form
-          :layout="'vertical'"
+          layout="vertical"
           class="details-form"
-          @submit.prevent="handleSubmit"
+          @submit.prevent="onSubmit"
         >
           <section class="flex-form-group">
-            <InputForm ref="firstNameInput" label="First Name" />
-            <InputForm ref="lastNameInput" label="Last Name" />
+            <!-- First Name -->
+            <InputForm
+              name="firstName"
+              placeholder="First Name"
+              label="First Name"
+            />
+            <!-- Last Name -->
+            <InputForm
+              name="lastName"
+              placeholder="Last Name"
+              label="Last Name"
+            />
           </section>
-          <a-form-item label="Gender" >
-            <a-select placeholder="Select Gender" v-model="gender">
-              <a-select-option value="male">Male</a-select-option>
-              <a-select-option value="female">Female</a-select-option>
-              <a-select-option value="other">Other</a-select-option>
-            </a-select>
+
+          <div class="flex-form-group">
+            <!-- Gender -->
+            <a-form-item
+              class="w-full"
+              label="Gender"
+              :validate-status="errors.gender ? 'error' : ''"
+              :help="errors.gender"
+            >
+              <a-select v-model:value="gender" placeholder="Select Gender">
+                <a-select-option value="male">Male</a-select-option>
+                <a-select-option value="female">Female</a-select-option>
+                <a-select-option value="other">Other</a-select-option>
+              </a-select>
+            </a-form-item>
+
+            <!-- Date of Birth -->
+            <DatePickerForm
+              name="dateOfBirth"
+              label="Date of Birth"
+              placeholder="Select your date of birth"
+            />
+          </div>
+
+          <!-- Email -->
+          <a-form-item label="Email">
+            <a-input name="email" placeholder="johndoe@example.com" disabled />
           </a-form-item>
-          <a-form-item label="Date of Birth" >
-            <DatePickerForm ref="datePicker" />
-          </a-form-item>
-          <a-form-item label="Email" required>
-            <a-input placeholder="johndoe@example.com" disabled />
-          </a-form-item>
+
+          <!-- Submit Button -->
           <a-button type="primary" class="update-button" htmlType="submit">
             Update Profile
           </a-button>
@@ -69,53 +95,76 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
+import { useForm, useField } from "vee-validate";
+import { toFieldValidator } from "@vee-validate/zod";
+import * as z from "zod";
 import InputForm from "@/components/InputForm.vue";
 import DatePickerForm from "@/components/DatePickerForm.vue";
 import { CameraFilled } from "@ant-design/icons-vue";
 
-definePageMeta({
-  layout: "default",
-});
-
+// Breadcrumb routes
 const routes = [{ path: "index", breadcrumbName: "Profile" }];
 
-const gender = ref(null);
-const profileImage = ref(null);
+// Profile image and gender
+// const profileImage = ref(null);
 const defaultImage =
   "https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5MC00NTk4LTk2OTYtNDU3NTJiM2QxNzM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg";
 
-const firstNameInput = ref(null);
-const lastNameInput = ref(null);
-const datePicker = ref(null);
+// Profile image state
+const profileImage = ref<string | null>(null);
 
-const handleFileChange = (event) => {
-  const file = event.target.files[0];
+// Define schema with Zod
+const schema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  gender: z.enum(["male", "female", "other"], {
+    message: "Gender is required",
+  }),
+  dateOfBirth: z.string().min(1, "Date of Birth is required"),
+});
+
+// Initialize the form
+const { handleSubmit, errors } = useForm({
+  validationSchema: toFieldValidator(schema),
+});
+
+// Use field for gender since it's not directly tied to an InputForm
+const { value: gender } = useField("gender");
+
+
+
+// File upload handling
+const handleFileChange = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = () => {
-      profileImage.value = reader.result;
+      profileImage.value = reader.result as string; // Ensure profileImage can accept a string
     };
     reader.readAsDataURL(file);
   }
 };
 
+// Trigger file upload
 const triggerFileUpload = () => {
-  const fileInput = document.querySelector("input[type='file']");
-  fileInput.click();
+  const fileInput = document.querySelector(
+    "input[type='file']"
+  ) as HTMLInputElement | null;
+  if (fileInput) {
+    fileInput.click(); // Safely call the click method
+  }
 };
 
-const handleSubmit = () => {
-  const firstName = firstNameInput.value?.inputData || "";
-  const lastName = lastNameInput.value?.inputData || "";
-  const dateOfBirth = datePicker.value?.selectedDate || "";
+// Handle form submission
+const onSubmit = handleSubmit((formValues) => {
+  console.log("Form submitted successfully:", formValues);
+});
 
-  console.log("First Name:", firstName);
-  console.log("Last Name:", lastName);
-  console.log("Gender:", gender.value);
-  console.log("Date of Birth:", dateOfBirth);
-};
+definePageMeta({
+  layout: "default",
+});
 </script>
 
 <style scoped>

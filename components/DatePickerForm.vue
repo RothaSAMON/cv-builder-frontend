@@ -1,48 +1,47 @@
 <template>
-  <a-form-item class="form-item" :label="label" :required="required" :rules="rules">
+  <a-form-item
+    class="w-full"
+    :label="label"
+    :validate-status="validationStatus"
+    :help="error"
+  >
     <a-date-picker
-      class="date-form"
-      v-model:value="selectedDate"
-      @change="emitDate"
+      class="w-full"
+      v-model="dateValue"
+      @change="handleChange"
       :placeholder="placeholder"
+      @blur="handleBlur"
     />
   </a-form-item>
 </template>
 
-<script setup>
-import { ref, defineExpose } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
+import { useField } from "vee-validate";
+import dayjs from "dayjs";
 
-const selectedDate = ref(null);
-
-const emitDate = () => {
-  console.log("Selected Date:", selectedDate.value);
-};
-
-defineExpose({ selectedDate });
-
-defineProps({
-  label: {
-    type: String,
-    default: "Date Picker",
-  },
-  required: {
-    type: Boolean,
-    default: false,
-  },
-  rules: {
-    type: Array,
-    default: () => [],
-  },
-  placeholder: {
-    type: String,
-    default: "Select a date",
-  },
-});
-</script>
-
-<style scoped>
-.form-item,
-.date-form {
-  width: 100%;
+interface Props {
+  name: string;
+  label: string;
+  placeholder?: string;
 }
-</style>
+
+const props = defineProps<Props>();
+
+const {
+  value: dateValue,
+  errorMessage,
+  handleBlur,
+  setValue,
+} = useField(props.name);
+
+const error = computed(() => errorMessage.value);
+const validationStatus = computed(() => {
+  if (error.value) return "error";
+  return dateValue.value ? "success" : "";
+});
+
+const handleChange = (date: dayjs.Dayjs | null) => {
+  setValue(date ? date.format("YYYY-MM-DD") : "");
+};
+</script>

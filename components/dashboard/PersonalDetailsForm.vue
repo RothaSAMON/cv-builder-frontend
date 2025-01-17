@@ -31,16 +31,26 @@
       </a-form-item>
 
       <div class="flex-form-group">
-        <InputForm name="firstName" placeholder="First Name" label="First Name" />
+        <InputForm
+          name="firstName"
+          placeholder="First Name"
+          label="First Name"
+        />
         <InputForm name="lastName" placeholder="Last Name" label="Last Name" />
       </div>
-      <InputForm name="personalPosition" placeholder="Position" label="Position" />
+      <InputForm
+        name="personalPosition"
+        placeholder="Position"
+        label="Position"
+      />
       <a-form-item label="Summary">
-        <a-textarea
+        <Field
           name="personalSummary"
-          rows="4"
+          as="a-textarea"
+          :rows="4"
           placeholder="Write a brief summary about yourself"
         />
+        <ErrorMessage name="personalSummary" class="error-message" />
       </a-form-item>
 
       <!-- Submit Button -->
@@ -50,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { useForm } from "vee-validate";
+import { useForm, Field, ErrorMessage } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
 import * as z from "zod";
 import { ref } from "vue";
@@ -105,5 +115,10 @@ const onSubmit = handleSubmit((values) => {
 
 .upload-container {
   margin-bottom: 16px;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9rem;
 }
 </style>
