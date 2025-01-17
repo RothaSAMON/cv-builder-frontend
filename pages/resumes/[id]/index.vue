@@ -54,10 +54,17 @@
               :languages="section.content"
               v-if="section.type === 'Languages'"
             />
+
+            <DashboardContactMeForm
+              v-if="section.type === 'Contact'"
+              :address="section.content.address"
+              :email="section.content.email"
+              :phoneNumber="section.content.phoneNumber"
+            />
           </div>
           <!-- Display CV Data -->
 
-          <DashboardContactMeForm :email="cvData?.email" />
+          <!-- <DashboardContactMeForm :email="cvData?.email" /> -->
           <DashboardReferenceForm :references="cvData?.references" />
 
           <!-- <DashboardSkillsForm :skills="cvData?.skills" /> -->
