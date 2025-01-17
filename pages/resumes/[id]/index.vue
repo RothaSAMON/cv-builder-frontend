@@ -49,6 +49,11 @@
               :skills="section.content"
               v-if="section.type === 'Skills'"
             />
+
+            <DashboardLanguagueForm
+              :languages="section.content"
+              v-if="section.type === 'Languages'"
+            />
           </div>
           <!-- Display CV Data -->
 
@@ -59,7 +64,7 @@
 
           <DashboardExperienceForm :experience="cvData?.experience" />
           <DashboardEducationForm :education="cvData?.education" />
-          <DashboardLanguagueForm :languages="cvData?.languages" />
+          <!-- <DashboardLanguagueForm :languages="cvData?.languages" /> -->
 
           <!-- Submit Button -->
           <div class="submit-container">
@@ -74,10 +79,12 @@
         </div>
 
         <!-- Right Section -->
-        <DashboardResume
-          :selectedTemplate="selectedTemplate"
-          :cvData="cvData"
-        />
+        <div class="right-section">
+          <DashboardResume
+            :selectedTemplate="selectedTemplate"
+            :cvData="cvData"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -176,5 +183,11 @@ const handleSubmit = () => {
 
 .submit-button {
   width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+  .right-section {
+    display: none;
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h3>Language</h3>
+      <h3>Languages</h3>
       <p class="sub-title">Write down the specific languages</p>
     </div>
 
@@ -63,6 +63,7 @@ import { useFieldArray, useForm, Field, ErrorMessage } from "vee-validate";
 import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
+import type { UpdateLanguageContent } from "~/types/section";
 
 // Define the validation schema
 const LanguageSchema = z.object({
@@ -74,13 +75,15 @@ const FormSchema = z.object({
   fields: z.array(LanguageSchema),
 });
 
+// Initialize form with validation
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: [{ language: "", level: "" }],
+    fields: [], // This will be populated dynamically from parent data
   },
 });
 
+// Dynamically set initial values with languages data from parent (cvData)
 const { fields, push, remove } = useFieldArray("fields");
 
 const addField = () => {
@@ -94,6 +97,15 @@ const removeField = (index: number) => {
 const onSubmit = handleSubmit((data) => {
   console.log("Submitted data:", data);
 });
+
+// Props for languages passed from parent
+const props = defineProps<{ languages: UpdateLanguageContent[] }>();
+// Initialize form fields with languages data
+if (props.languages && props.languages.length > 0) {
+  props.languages.forEach((language) => {
+    push({ language: language.language, level: language.level });
+  });
+}
 </script>
 
 <style scoped>
