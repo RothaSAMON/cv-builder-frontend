@@ -36,28 +36,27 @@
               </div>
             </div>
           </section>
+          <div v-for="section in cvData.sections">
+            <DashboardPersonalDetailsForm
+              v-if="section.type === 'PersonalDetail'"
+              :firstName="section.content.firstName"
+              :lastName="section.content.lastName"
+              :personalPosition="section.content.position"
+              :personalSummary="section.content.summary"
+            />
 
-          <!-- Display CV Data -->
-          <div>
-            <h4>CV Details</h4>
-            <p><strong>First Name:</strong> {{ cvData?.userId?.firstName }}</p>
-            <p><strong>Last Name:</strong> {{ cvData?.userId?.lastName }}</p>
-            <p><strong>Email:</strong> {{ cvData?.userId?.email }}</p>
-            <p>
-              <strong>Date of Birth:</strong> {{ cvData?.userId?.dateOfBirth }}
-            </p>
-            <p><strong>Title:</strong> {{ cvData?.title }}</p>
+            <DashboardSkillsForm
+              :skills="section.content"
+              v-if="section.type === 'Skills'"
+            />
           </div>
-
           <!-- Display CV Data -->
-          <DashboardPersonalDetailsForm
-            :firstName="cvData?.firstName"
-            :lastName="cvData?.lastName"
-            :dateOfBirth="cvData?.dateOfBirth"
-          />
+
           <DashboardContactMeForm :email="cvData?.email" />
           <DashboardReferenceForm :references="cvData?.references" />
-          <DashboardSkillsForm :skills="cvData?.skills" />
+
+          <!-- <DashboardSkillsForm :skills="cvData?.skills" /> -->
+
           <DashboardExperienceForm :experience="cvData?.experience" />
           <DashboardEducationForm :education="cvData?.education" />
           <DashboardLanguagueForm :languages="cvData?.languages" />
@@ -117,10 +116,7 @@ const cvId = computed(() => route.params.id);
 
 const { data: cvData, isLoading, isError } = fetchCVById(cvId.value);
 
-// Log data whenever it changes
-watchEffect(() => {
-  console.log("Fetched CV Data:", cvData.value);
-});
+console.log("Data", cvData.value);
 
 // Handle form submission
 const handleSubmit = () => {

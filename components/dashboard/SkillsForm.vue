@@ -60,6 +60,7 @@ import { useFieldArray, useForm, Field, ErrorMessage } from "vee-validate";
 import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
+import type { UpdateSkillContent } from "~/types/section";
 
 // Define the validation schema
 const SkillSchema = z.object({
@@ -74,10 +75,11 @@ const FormSchema = z.object({
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: [{ skill: "", level: "" }],
+    fields: [], // This will be populated dynamically from parent data
   },
 });
 
+// Dynamically set initial values with skills data from parent (cvData)
 const { fields, push, remove } = useFieldArray("fields");
 
 const addField = () => {
@@ -91,6 +93,13 @@ const removeField = (index: number) => {
 const onSubmit = handleSubmit((data) => {
   console.log("Submitted data:", data);
 });
+
+const props = defineProps<{ skills: UpdateSkillContent[] }>();
+if (props.skills) {
+  props.skills.forEach((skill) => {
+    push({ skill: skill.name, level: skill.level });
+  });
+}
 </script>
 
 <style scoped>

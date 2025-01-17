@@ -64,6 +64,7 @@
 import { ref, computed } from "vue";
 import { PlusOutlined } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
+import { useCV } from "../../composables/useCv";
 
 // Props
 defineProps({
@@ -79,7 +80,9 @@ const router = useRouter();
 // Fetch data from API
 const cvData = computed(() => cvQueryAll.data.value || []);
 
-const itemsPerPage = 3;
+// console.log("My data", cvQueryAll.data)
+
+const itemsPerPage = 10;
 const currentPage = ref(1);
 
 // Paginated resumes based on current page

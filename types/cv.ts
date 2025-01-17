@@ -1,16 +1,11 @@
-export type UserType = {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  dateOfBirth: string; // ISO date string
-  email: string;
-  imageProfile: string; // URL to the image
-};
+import type { User } from "./auth";
+import type { UpdateSectionArray } from "./section";
 
-export type CVType = {
+// Type for Resume
+export interface CVType {
   _id: string;
-  userId: UserType;
+  userId: User;
   title: string;
-  previewImageUrl: string; // URL to the preview image
-};
+  previewImageUrl: string;
+  sections: UpdateSectionArray;
+}

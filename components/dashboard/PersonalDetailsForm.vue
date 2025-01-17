@@ -33,31 +33,31 @@
       <!-- Form Fields -->
       <div class="flex-form-group">
         <InputForm
-        :initial-value="props.firstName"
+          :initial-value="props.firstName"
           name="firstName"
           label="First Name"
           placeholder="Enter your first name"
         />
-        <InputForm :initial-value="props.lastName" name="lastName" placeholder="Last Name" label="Last Name" />
+        <InputForm
+          :initial-value="props.lastName"
+          name="lastName"
+          label="Last Name"
+          placeholder="Enter your last name"
+        />
       </div>
       <InputForm
         :initial-value="props.personalPosition"
         name="personalPosition"
-        placeholder="Position"
         label="Position"
+        placeholder="Enter your position"
       />
-      <a-form-item
+      <TextAreaForm
+        :initial-value="props.personalSummary"
+        name="personalSummary"
         label="Summary"
-        :validate-status="errors.personalSummary ? 'error' : ''"
-        :help="errors.personalSummary"
-      >
-        <a-textarea
-          v-model="values.personalSummary"
-          name="personalSummary"
-          rows="4"
-          placeholder="Write a brief summary about yourself"
-        />
-      </a-form-item>
+        placeholder="Write a brief summary about yourself"
+        :rows="4"
+      />
 
       <!-- Submit Button -->
       <a-button type="primary" html-type="submit">Submit</a-button>
@@ -71,6 +71,7 @@ import { useForm, defineRule } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
 import * as z from "zod";
 import InputForm from "~/components/InputForm.vue";
+import TextAreaForm from "~/components/TextAreaForm.vue";
 
 // Props Definition
 interface DashboardPersonalDetailsFormProps {
@@ -92,7 +93,6 @@ const schema = z.object({
 // Initialize Form
 const { handleSubmit, values, errors } = useForm({
   validationSchema: toFieldValidator(schema),
-  
 });
 
 // Image Upload Logic
