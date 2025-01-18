@@ -61,6 +61,20 @@
               :email="section.content.email"
               :phoneNumber="section.content.phoneNumber"
             />
+
+            <DashboardExperienceForm
+              v-if="section.type === 'Experiences'"
+              :experiences="section.content"
+            />
+
+            <DashboardEducationForm
+              v-if="section.type === 'Education'"
+              :education="section.content"
+              :degreeMajor="section.content.degreeMajor"
+              :schoolName="section.content.schoolName"
+              :startDate="section.content.startDate"
+              :endDate="section.content.endDate"
+            />
           </div>
           <!-- Display CV Data -->
 
@@ -69,8 +83,8 @@
 
           <!-- <DashboardSkillsForm :skills="cvData?.skills" /> -->
 
-          <DashboardExperienceForm :experience="cvData?.experience" />
-          <DashboardEducationForm :education="cvData?.education" />
+          <!-- <DashboardExperienceForm :experience="cvData?.experience" /> -->
+          <!-- <DashboardEducationForm :education="cvData?.education" /> -->
           <!-- <DashboardLanguagueForm :languages="cvData?.languages" /> -->
 
           <!-- Submit Button -->
