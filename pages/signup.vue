@@ -38,8 +38,8 @@
           :help="genderError"
         >
           <a-select v-model:value="gender" placeholder="Select your gender">
-            <a-select-option value="male">Male</a-select-option>
-            <a-select-option value="female">Female</a-select-option>
+            <a-select-option value="Male">Male</a-select-option>
+            <a-select-option value="Female">Female</a-select-option>
           </a-select>
         </a-form-item>
 
@@ -85,43 +85,36 @@
 <script setup lang="ts">
 import { useForm, useField } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
-import * as z from "zod";
 import InputForm from "@/components/InputForm.vue";
 import DatePickerForm from "@/components/DatePickerForm.vue";
 
-// Define schema with Zod
-const schema = z
-  .object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    gender: z.enum(["male", "female"], { message: "Gender is required" }),
-    dateOfBirth: z.string().min(1, "Date of Birth is required"),
-    email: z.string().email("Invalid email address"),
-    password: z
-      .string()
-      .min(8, "Password should be at least 8 characters long"),
-    confirmPassword: z.string().min(8, "Confirm Password is required"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
+const { signupMutation } = useAuth();
 // Initialize the form
 const { handleSubmit, errors } = useForm({
-  validationSchema: toFieldValidator(schema),
-  // initialValues : { 
-  //   firstName: 
-
-  // }
+  validationSchema: toFieldValidator(signUpSchema),
 });
 
 // Use field for gender since it's not directly tied to an <InputForm>
 const { value: gender, errorMessage: genderError } = useField("gender");
 
 // Handle form submission
-const onSubmit = handleSubmit((formValues) => {
-  console.log("Form submitted successfully:", formValues);
+const onSubmit = handleSubmit(async (formValues) => {
+  try {
+    const result = await signupMutation.mutateAsync({
+      firstName: formValues.firstName,
+      lastName: formValues.lastName,
+      email: formValues.email,
+      dateOfBirth: formValues.dateOfBirth,
+      gender: formValues.gender,
+      password: formValues.password,
+      confirmPassword: formValues.confirmPassword,
+    });
+    if (result) {
+      navigateTo("dashboard");
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 definePageMeta({
