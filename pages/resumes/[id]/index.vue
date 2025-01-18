@@ -36,67 +36,58 @@
               </div>
             </div>
           </section>
-          <div v-for="section in cvData.sections">
+
+          <div v-for="section in cvData.sections" :key="section._id">
             <DashboardPersonalDetailsForm
               v-if="section.type === 'PersonalDetail'"
-              :firstName="section.content.firstName"
-              :lastName="section.content.lastName"
-              :personalPosition="section.content.position"
-              :personalSummary="section.content.summary"
+              :firstName="section.content?.firstName || ''"
+              :lastName="section.content?.lastName || ''"
+              :personalPosition="section.content?.position || ''"
+              :personalSummary="section.content?.summary || ''"
             />
 
             <DashboardSkillsForm
-              :skills="section.content"
               v-if="section.type === 'Skills'"
+              :skills="section.content || ''"
             />
 
             <DashboardLanguagueForm
-              :languages="section.content"
               v-if="section.type === 'Languages'"
+              :languages="section.content || ''"
             />
 
             <DashboardContactMeForm
               v-if="section.type === 'Contact'"
-              :address="section.content.address"
-              :email="section.content.email"
-              :phoneNumber="section.content.phoneNumber"
+              :address="section.content?.address || ''"
+              :email="section.content?.email || ''"
+              :phoneNumber="section.content?.phoneNumber || ''"
             />
 
             <DashboardExperienceForm
               v-if="section.type === 'Experiences'"
-              :experiences="section.content"
+              :experiences="section.content || ''"
             />
 
             <DashboardEducationForm
               v-if="section.type === 'Education'"
-              :education="section.content"
-              :degreeMajor="section.content.degreeMajor"
-              :schoolName="section.content.schoolName"
-              :startDate="section.content.startDate"
-              :endDate="section.content.endDate"
+              :education="section.content || ''"
+              :degreeMajor="section.content?.degreeMajor || ''"
+              :schoolName="section.content?.schoolName || ''"
+              :startDate="section.content?.startDate || ''"
+              :endDate="section.content?.endDate || ''"
             />
 
             <DashboardReferenceForm
               v-if="section.type === 'Reference'"
-              :references="section.content"
-              :firstName="section.content.firstName"
-              :lastName="section.content.lastName"
-              :position="section.content.position"
-              :email="section.content.email"
-              :phoneNumber="section.content.phoneNumber"
-              :company="section.content.company"
+              :references="section.content || ''"
+              :firstName="section.content?.firstName || ''"
+              :lastName="section.content?.lastName || ''"
+              :position="section.content?.position || ''"
+              :email="section.content?.email || ''"
+              :phoneNumber="section.content?.phoneNumber || ''"
+              :company="section.content?.company || ''"
             />
           </div>
-          <!-- Display CV Data -->
-
-          <!-- <DashboardContactMeForm :email="cvData?.email" /> -->
-          <!-- <DashboardReferenceForm :references="cvData?.references" /> -->
-
-          <!-- <DashboardSkillsForm :skills="cvData?.skills" /> -->
-
-          <!-- <DashboardExperienceForm :experience="cvData?.experience" /> -->
-          <!-- <DashboardEducationForm :education="cvData?.education" /> -->
-          <!-- <DashboardLanguagueForm :languages="cvData?.languages" /> -->
 
           <!-- Submit Button -->
           <div class="submit-container">
@@ -123,13 +114,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from "vue";
+import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
-// import { useCV } from "~/composables/useCV";
-import DashboardContactMeForm from "../../../components/dashboard/ContactMeForm.vue";
-import DashboardPersonalDetailsForm from "../../../components/dashboard/PersonalDetailsForm.vue";
-import DashboardReferenceForm from "../../../components/dashboard/ReferenceForm.vue";
-import DashboardResume from "../../../components/dashboard/Resume.vue";
+// import DashboardPageHeader from "@/components/DashboardPageHeader.vue";
+// import DashboardPersonalDetailsForm from "@/components/dashboard/PersonalDetailsForm.vue";
+// import DashboardSkillsForm from "@/components/dashboard/SkillsForm.vue";
+// import DashboardLanguagueForm from "@/components/dashboard/LanguagueForm.vue";
+// import DashboardContactMeForm from "@/components/dashboard/ContactMeForm.vue";
+// import DashboardExperienceForm from "@/components/dashboard/ExperienceForm.vue";
+// import DashboardEducationForm from "@/components/dashboard/EducationForm.vue";
+// import DashboardReferenceForm from "@/components/dashboard/ReferenceForm.vue";
+// import DashboardResume from "@/components/dashboard/Resume.vue";
 
 const routes = [
   { path: "/resumes", breadcrumbName: "Resumes" },
@@ -154,8 +149,6 @@ const { fetchCVById } = useCV();
 const cvId = computed(() => route.params.id);
 
 const { data: cvData, isLoading, isError } = fetchCVById(cvId.value);
-
-console.log("Data", cvData.value);
 
 // Handle form submission
 const handleSubmit = () => {
