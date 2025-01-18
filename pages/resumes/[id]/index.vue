@@ -75,11 +75,22 @@
               :startDate="section.content.startDate"
               :endDate="section.content.endDate"
             />
+
+            <DashboardReferenceForm
+              v-if="section.type === 'Reference'"
+              :references="section.content"
+              :firstName="section.content.firstName"
+              :lastName="section.content.lastName"
+              :position="section.content.position"
+              :email="section.content.email"
+              :phoneNumber="section.content.phoneNumber"
+              :company="section.content.company"
+            />
           </div>
           <!-- Display CV Data -->
 
           <!-- <DashboardContactMeForm :email="cvData?.email" /> -->
-          <DashboardReferenceForm :references="cvData?.references" />
+          <!-- <DashboardReferenceForm :references="cvData?.references" /> -->
 
           <!-- <DashboardSkillsForm :skills="cvData?.skills" /> -->
 

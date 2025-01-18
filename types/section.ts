@@ -50,6 +50,7 @@ export interface UpdateReferenceContent {
   email?: string;
   company?: string;
   position?: string;
+  phoneNumber?: string;
 }
 
 // Type mapping for section schemas

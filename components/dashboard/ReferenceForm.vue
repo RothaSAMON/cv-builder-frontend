@@ -6,29 +6,65 @@
     </div>
 
     <a-form @submit.prevent="onSubmit" layout="vertical">
-      <!-- Name Fields -->
       <div class="flex-form-group">
-        <InputForm name="refFirstName" placeholder="First Name" label="First Name" />
-        <InputForm name="refLastName" placeholder="Last Name" label="Last Name" />
+        <InputForm
+          :initial-value="formValues.refFirstName"
+          name="refFirstName"
+          placeholder="First Name"
+          label="First Name"
+        />
+        <InputForm
+          :initial-value="formValues.refLastName"
+          name="refLastName"
+          placeholder="Last Name"
+          label="Last Name"
+        />
       </div>
 
-      <!-- Position and Email -->
       <div class="flex-form-group">
-        <InputForm name="refPosition" placeholder="Position" label="Position" />
-        <InputForm name="refEmail" placeholder="example@gmail.com" label="Email" />
+        <InputForm
+          :initial-value="formValues.refPosition"
+          name="refPosition"
+          placeholder="Position"
+          label="Position"
+        />
+        <InputForm
+          :initial-value="formValues.refEmail"
+          name="refEmail"
+          placeholder="example@gmail.com"
+          label="Email"
+        />
       </div>
 
-      <!-- Phone Number and Company -->
       <div class="flex-form-group">
-        <InputForm name="refPhoneNumber" placeholder="+855 123 456" label="Phone Number" />
-        <InputForm name="refCompany" placeholder="Company Name" label="Company" />
+        <InputForm
+          :initial-value="formValues.refPhoneNumber"
+          name="refPhoneNumber"
+          placeholder="+855 123 456"
+          label="Phone Number"
+        />
+        <InputForm
+          :initial-value="formValues.refCompany"
+          name="refCompany"
+          placeholder="Company Name"
+          label="Company"
+        />
       </div>
 
-      <!-- Submit Button -->
       <a-form-item>
         <a-button type="primary" html-type="submit">Submit</a-button>
       </a-form-item>
     </a-form>
+<!-- 
+    <div>
+      <h3>Reference Information</h3>
+      <p>First Name: {{ formValues.refFirstName }}</p>
+      <p>Last Name: {{ formValues.refLastName }}</p>
+      <p>Position: {{ formValues.refPosition }}</p>
+      <p>Email: {{ formValues.refEmail }}</p>
+      <p>Phone Number: {{ formValues.refPhoneNumber }}</p>
+      <p>Company: {{ formValues.refCompany }}</p>
+    </div> -->
   </section>
 </template>
 
@@ -37,9 +73,19 @@ import { useForm } from "vee-validate";
 import * as z from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import InputForm from "~/components/InputForm.vue";
-import DatePickerForm from "~/components/DatePickerForm.vue";
+import type { UpdateReferenceContent } from "~/types/section";
 
-// Zod schema for validation
+const props = defineProps<{ references: UpdateReferenceContent[] }>();
+
+const formValues = reactive({
+  refFirstName: props?.references[0]?.firstName || "",
+  refLastName: props?.references[0]?.lastName || "",
+  refPosition: props?.references[0]?.position || "",
+  refEmail: props?.references[0]?.email || "",
+  refPhoneNumber: props?.references[0]?.phoneNumber || "",
+  refCompany: props?.references[0]?.company || "",
+});
+
 const schema = z.object({
   refFirstName: z.string().min(1, "First name is required"),
   refLastName: z.string().min(1, "Last name is required"),
@@ -49,12 +95,10 @@ const schema = z.object({
   refCompany: z.string().min(1, "Company name is required"),
 });
 
-// Initialize form with vee-validate and zod schema
-const { handleSubmit, setFieldValue } = useForm({
+const { handleSubmit } = useForm({
   validationSchema: toFieldValidator(schema),
 });
 
-// Handle form submission
 const onSubmit = handleSubmit((values) => {
   console.log("Reference Form Submitted:", values);
 });
