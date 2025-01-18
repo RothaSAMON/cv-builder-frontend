@@ -6,29 +6,44 @@
         All your resumes, that will help you to find a job.
       </p>
 
-      <!-- Create Button -->
-      <div class="create-button-container">
-        <a-button type="primary" @click="createResume"
-          ><PlusOutlined /> Create</a-button
-        >
+      <!-- Create Button (conditionally rendered) -->
+      <div class="create-button-container" v-if="showCreateButton">
+        <a-button type="primary" @click="createResume">
+          <PlusOutlined /> Create
+        </a-button>
       </div>
     </section>
 
     <!-- Resume Cards -->
     <a-row :gutter="16">
-      <a-col v-for="resume in paginatedResumes" :key="resume.id" :span="8">
+      <!-- Dynamically render fetched resumes -->
+      <a-col
+        v-for="resume in paginatedResumes"
+        :key="resume._id"
+        :span="8"
+        @click="goToResume(resume._id)"
+      >
         <a-card :hoverable="true">
-          <!-- Image on top and title at the bottom -->
           <a-row align="middle" justify="center">
+            <!-- Resume Preview Image -->
             <a-col :span="24" class="image-container">
               <NuxtImg
-                src="https://cdn.enhancv.com/images/648/i/aHR0cHM6Ly9jZG4uZW5oYW5jdi5jb20vcHJlZGVmaW5lZC1leGFtcGxlcy9rRzlHZ1dYdG5kVjZpQlhvWGxlNUxRY3Y1Y2R1NjdCQWdrTGJ5OVlGL2ltYWdlLnBuZw~~.png"
-                alt="Resume Thumbnail"
+                :src="
+                  resume.previewImageUrl ||
+                  'https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT.jpg'
+                "
+                :alt="resume.title"
                 class="resume-image"
               />
             </a-col>
+
+            <!-- Resume Title and Author -->
             <a-col :span="24" class="title-container">
-              <h3>{{ resume.name }}</h3>
+              <h3>{{ resume.title }}</h3>
+              <p class="sub-title">
+                Created by: {{ resume.userId.firstName }}
+                {{ resume.userId.lastName }}
+              </p>
             </a-col>
           </a-row>
         </a-card>
@@ -39,7 +54,6 @@
     <a-pagination
       :current="currentPage"
       :pageSize="itemsPerPage"
-      :total="resumesData.length"
       @change="onPageChange"
       class="pagination"
     />
@@ -48,32 +62,47 @@
 
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { AppstoreOutlined, PlusOutlined } from "@ant-design/icons-vue";
+import { PlusOutlined } from "@ant-design/icons-vue";
+import { useRouter } from "vue-router";
+import { useCV } from "../../composables/useCv";
 
-const resumesData = [
-  { id: 1, name: "John Doe", created_at: "2024-01-01" },
-  { id: 2, name: "Jane Smith", created_at: "2024-02-01" },
-  { id: 3, name: "Alex Brown", created_at: "2024-03-01" },
-  { id: 4, name: "Emily Johnson", created_at: "2024-04-01" },
-  { id: 5, name: "Michael White", created_at: "2024-05-01" },
-  { id: 6, name: "Sarah Lee", created_at: "2024-06-01" },
-  { id: 7, name: "David Green", created_at: "2024-07-01" },
-];
+// Props
+defineProps({
+  showCreateButton: {
+    type: Boolean,
+    default: true, // Default value to show the button
+  },
+});
 
-const itemsPerPage = 3;
+const { cvQueryAll } = useCV();
+const router = useRouter();
+
+// Fetch data from API
+const cvData = computed(() => cvQueryAll.data.value || []);
+
+// console.log("My data", cvQueryAll.data)
+
+const itemsPerPage = 10;
 const currentPage = ref(1);
 
+// Paginated resumes based on current page
 const paginatedResumes = computed(() => {
   const startIndex = (currentPage.value - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  return resumesData.slice(startIndex, endIndex);
+  return cvData.value.slice(startIndex, endIndex);
 });
 
+// Change page
 const onPageChange = (page: number) => {
   currentPage.value = page;
 };
 
-// Function to handle Create button click
+// Navigate to specific resume detail page
+const goToResume = (resumeId: string) => {
+  router.push(`/resumes/${resumeId}`);
+};
+
+// Handle Create button
 const createResume = () => {
   console.log("Create Resume clicked");
 };

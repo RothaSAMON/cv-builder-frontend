@@ -5,12 +5,12 @@
     :validate-status="error ? 'error' : ''"
     :help="error"
   >
-    <a-input
+    <a-textarea
       :value="value"
-      class="w-full"
+      :rows="rows"
       :placeholder="placeholder"
-      @input="handleInput" 
-      @blur="handleBlur" 
+      @input="handleInput"
+      @blur="handleBlur"
     />
   </a-form-item>
 </template>
@@ -23,22 +23,21 @@ interface Props {
   name: string;
   label: string;
   placeholder?: string;
-  initialValue?: string; // Accept initial value for the field
+  rows?: number;
+  initialValue?: string;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits(["update:modelValue"]);
 
-// Register field with useField
+// Use vee-validate's useField
 const { value, errorMessage, handleBlur, setValue } = useField(
   props.name,
   undefined,
-  {
-    initialValue: props.initialValue, // Initialize field value from prop
-  }
+  { initialValue: props.initialValue }
 );
 
-// Watch `initialValue` for changes (optional, in case parent updates it dynamically)
+// Watch for prop updates to initialValue
 watch(
   () => props.initialValue,
   (newValue) => {
@@ -50,11 +49,11 @@ watch(
 
 // Emit input changes back to the parent
 const handleInput = (event: Event) => {
-  const inputValue = (event.target as HTMLInputElement).value;
-  setValue(inputValue); // Update vee-validate field value
-  emit("update:modelValue", inputValue); // Notify parent about changes
+  const inputValue = (event.target as HTMLTextAreaElement).value;
+  setValue(inputValue);
+  emit("update:modelValue", inputValue);
 };
 
-// Computed properties for validation state
+// Computed validation error
 const error = computed(() => errorMessage.value);
 </script>

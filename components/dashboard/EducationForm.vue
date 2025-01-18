@@ -9,8 +9,10 @@
       <div v-for="(field, index) in fields" :key="index" class="form-row">
         <section>
           <div class="form-row">
-            <a-form-item label="School Name">
+            <!-- School Name -->
+            <a-form-item class="w-full" label="School Name">
               <Field
+                class="w-full"
                 :name="`fields.${index}.schoolName`"
                 as="a-input"
                 placeholder="School Name"
@@ -21,8 +23,10 @@
               />
             </a-form-item>
 
-            <a-form-item label="Degree/Major">
+            <!-- Degree/Major -->
+            <a-form-item class="w-full" label="Degree/Major">
               <Field
+                class="w-full"
                 :name="`fields.${index}.degreeMajor`"
                 as="a-input"
                 placeholder="Degree/Major"
@@ -36,26 +40,26 @@
 
           <div class="form-row">
             <!-- Start Date -->
-            <DatePickerForm
-              :name="`fields.${index}.startDate`"
-              label="Start Date"
-              placeholder="Select start date"
-            />
-            <ErrorMessage
-              :name="`fields.${index}.startDate`"
-              class="error-message"
-            />
+            <a-form-item class="w-full" label="Start Date">
+              <input
+                class="w-full input-date"
+                type="date"
+                :name="`fields.${index}.startDate`"
+                :value="formatDate(props.education[index]?.startDate)"
+                @input="updateStartDate($event, index)"
+              />
+            </a-form-item>
 
             <!-- End Date -->
-            <DatePickerForm
-              :name="`fields.${index}.endDate`"
-              label="End Date"
-              placeholder="Select end date"
-            />
-            <ErrorMessage
-              :name="`fields.${index}.endDate`"
-              class="error-message"
-            />
+            <a-form-item class="w-full" label="End Date">
+              <input
+                class="w-full input-date"
+                type="date"
+                :name="`fields.${index}.endDate`"
+                :value="formatDate(props.education[index]?.endDate)"
+                @input="updateEndDate($event, index)"
+              />
+            </a-form-item>
           </div>
         </section>
 
@@ -84,9 +88,19 @@ import { useFieldArray, useForm, Field, ErrorMessage } from "vee-validate";
 import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
-import DatePickerForm from "../../components/DatePickerForm.vue";
+import dayjs from "dayjs";
 
-// Define the validation schema
+// Props received from the parent
+const props = defineProps<{
+  education: Array<{
+    schoolName: string;
+    degreeMajor: string;
+    startDate: string;
+    endDate: string;
+  }>;
+}>();
+
+// Validation schema for an individual education entry
 const EducationSchema = z.object({
   schoolName: z.string().min(1, "School Name is required"),
   degreeMajor: z.string().min(1, "Degree/Major is required"),
@@ -98,46 +112,58 @@ const FormSchema = z.object({
   fields: z.array(EducationSchema),
 });
 
-const { handleSubmit, values, resetForm } = useForm({
+const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: [
-      {
-        schoolName: "",
-        degreeMajor: "",
-        startDate: "",
-        endDate: "",
-      },
-    ],
+    fields: props.education || [],
   },
 });
 
-const { fields, push, remove } = useFieldArray("fields");
+// const { fields, push, remove } = useFieldArray<{
+//   schoolName: string;
+//   degreeMajor: string;
+//   startDate: string;
+//   endDate: string;
+// }>("fields");
 
+// Add a new field
 const addField = () => {
   push({ schoolName: "", degreeMajor: "", startDate: "", endDate: "" });
 };
 
+// Remove a field
 const removeField = (index: number) => {
   remove(index);
 };
 
+// Format date to the required format for the input[type="date"] field (YYYY-MM-DD)
+const formatDate = (date: string) => {
+  return dayjs(date).format("YYYY-MM-DD"); // Ensure the date is in the correct format
+};
+
+const { fields, push, remove } = useFieldArray<{
+  schoolName: string;
+  degreeMajor: string;
+  startDate: string;
+  endDate: string;
+}>("fields");
+
+const updateStartDate = (event: Event, index: number) => {
+  const newStartDate = (event.target as HTMLInputElement).value;
+  const { value } = fields.value[index];
+  value.startDate = newStartDate;
+};
+
+const updateEndDate = (event: Event, index: number) => {
+  const newEndDate = (event.target as HTMLInputElement).value;
+  const { value } = fields.value[index];
+  value.endDate = newEndDate;
+};
+
+// Submit form handler
 const onSubmit = handleSubmit((data) => {
   console.log("Submitted data:", data);
-
-  // Clear form after successful submission
-  resetForm({
-    values: {
-      fields: [
-        {
-          schoolName: "",
-          degreeMajor: "",
-          startDate: "",
-          endDate: "",
-        },
-      ],
-    },
-  });
+  // Do not reset the form here
 });
 </script>
 
@@ -155,5 +181,9 @@ const onSubmit = handleSubmit((data) => {
 .error-message {
   color: red;
   font-size: 0.9rem;
+}
+
+.input-date {
+  width: 100%;
 }
 </style>

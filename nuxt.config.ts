@@ -3,7 +3,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   // Add your plugin here
-  plugins: ["@/plugins/ant-design-vue.js", "@/plugins/vee-validate.ts"],
+  plugins: [
+    "@/plugins/ant-design-vue.js",
+    "@/plugins/vee-validate.ts",
+    "@/plugins/axios.ts",
+    "@/plugins/vue-query.ts",
+  ],
 
   // Add Ant Design styles here
   css: ["@/assets/css/global.css"],
@@ -22,7 +27,7 @@ export default defineNuxtConfig({
     strict: true,
   },
 
-  modules: ["@nuxtjs/google-fonts", "@nuxt/icon", "@nuxt/image"],
+  modules: ["@nuxtjs/google-fonts", "@nuxt/icon", "@nuxt/image", "@pinia/nuxt"],
 
   googleFonts: {
     families: {
@@ -30,5 +35,15 @@ export default defineNuxtConfig({
       Roboto: true,
       Poppins: true,
     },
+  },
+
+  // Environment variables
+  runtimeConfig: {
+    public: {
+      myApiUrl: process.env.NUXT_SERVER_BASE_URL,
+    },
+    // private: {
+    //     mySecretKey: process.env.NUXT_SECRET_KEY, // Accessible server-side only
+    // },
   },
 });
