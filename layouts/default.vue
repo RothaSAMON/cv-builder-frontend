@@ -1,4 +1,5 @@
 <template>
+  <CustomAlert />
   <a-layout class="main-layout-container">
     <Sidebar />
     <a-layout class="layout-container">
@@ -11,10 +12,10 @@
 </template>
 
 <script setup lang="ts">
-// Fetch user data directly in the layout
-const { userQuery } = useUser();
+import { useAlertStore } from '~/store/alertStore';
 
-const router = useRouter();
+// Fetch user data directly in the layout
+const alertStore = useAlertStore()
 
 </script>
 <style scoped>

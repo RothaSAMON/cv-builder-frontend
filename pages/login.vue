@@ -49,6 +49,7 @@
 <script setup lang="ts">
 import { useForm } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
+import { useAlertStore } from "~/store/alertStore";
 
 // Initialize Vee Validate with the schema
 const { handleSubmit } = useForm({
@@ -56,6 +57,8 @@ const { handleSubmit } = useForm({
 });
 
 const { loginMutation } = useAuth();
+
+const alertStore = useAlertStore();
 
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
@@ -67,10 +70,19 @@ const onSubmit = handleSubmit(async (values) => {
     });
 
     if (result) {
+      alertStore.showAlert({
+        message: result.message,
+        type: "success",
+        duration: 5000,
+      });
       navigateTo("/dashboard");
     }
   } catch (error: any) {
-    console.log(error.response.data.message);
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
   }
 });
 
