@@ -13,7 +13,6 @@ export interface User {
 
 export interface Tokens {
   accessToken: string;
-  refreshToken: string;
 }
 
 export type LoginType = z.infer<typeof loginSchema>;

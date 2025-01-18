@@ -133,7 +133,19 @@ const { handleSubmit, errors } = useForm({
 // Use field for gender since it's not directly tied to an InputForm
 const { value: gender } = useField("gender");
 
+const { userQuery } = useUser();
 
+const router = useRouter();
+
+// Redirect logic
+watchEffect(() => {
+  if (userQuery.isLoading.value) return; // Wait for the query to finish loading
+
+  if (userQuery.error.value || !userQuery.data.value) {
+    console.error("User not authenticated or an error occurred.");
+    router.push("/login");
+  }
+});
 
 // File upload handling
 const handleFileChange = (event: Event) => {

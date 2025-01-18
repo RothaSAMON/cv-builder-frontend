@@ -10,7 +10,13 @@
   </a-layout>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// Fetch user data directly in the layout
+const { userQuery } = useUser();
+
+const router = useRouter();
+
+</script>
 <style scoped>
 .main-layout-container {
   background-color: white !important;

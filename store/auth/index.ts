@@ -1,35 +1,27 @@
-import type { Tokens, User } from "@/types/auth";
+import type { User } from "@/types/auth";
 
 interface AuthState {
   user: User | null;
-  tokens: Tokens | null;
 }
 
 export const useAuthStore = defineStore("auth", {
   state: (): AuthState => ({
     user: null,
-    tokens: null,
   }),
 
   actions: {
-    setAuth(tokens: Tokens) {
-      // this.user = userData;
-      this.tokens = tokens;
-    },
-
-    updateTokens(tokens: Tokens) {
-      this.tokens = tokens;
+    setUser(userData: User) {
+      this.user = userData;
     },
 
     clearAuth() {
       this.user = null;
-      this.tokens = null;
     },
   },
 
   getters: {
     isAuthenticated(): boolean {
-      return !!this.user?.id;
+      return !!this.user?.id; // Check if a user is logged in by verifying the existence of a user ID
     },
   },
 });

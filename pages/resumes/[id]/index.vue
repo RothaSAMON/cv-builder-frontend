@@ -130,6 +130,9 @@ const routes = [
   { path: "/resumes", breadcrumbName: "Resumes" },
   { path: "/resumes/:id", breadcrumbName: "Resumes Action" },
 ];
+definePageMeta({
+  layout: "dashboard"
+})
 
 // Template selection
 const template1 =
