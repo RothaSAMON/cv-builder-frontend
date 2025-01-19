@@ -1,6 +1,11 @@
 <template>
   <header class="header-container">
-    <section class="user-info" @click="toggleDropdown">
+    <section
+      class="user-info"
+      @mouseover="isDropdownOpen = true"
+      @mouseleave="isDropdownOpen = false"
+      @click="navigateToProfile"
+    >
       <a-avatar
         class="user-avatar"
         size="large"
@@ -27,11 +32,15 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { useUser } from "~/composables/useUser";
 
 const isDropdownOpen = ref(false);
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
+
+// Navigate to profile page on click
+const router = useRouter();
+const navigateToProfile = () => {
+  router.push("/profile");
 };
 
 // Fetch user data
@@ -57,6 +66,7 @@ const defaultAvatar = "https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5M
   align-items: center;
   gap: 1rem;
   cursor: pointer;
+  position: relative;
 }
 
 .user-details {
