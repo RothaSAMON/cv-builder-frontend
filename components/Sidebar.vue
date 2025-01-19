@@ -1,6 +1,6 @@
 <template>
   <a-layout-sider breakpoint="lg" collapsible class="sidebar-container">
-    <div class="logo">Rezume</div>
+    <div class="logo">Rizz</div>
     <a-menu theme="light" mode="inline" :defaultSelectedKeys="['1']">
       <!-- Dashboard -->
       <a-menu-item key="1">

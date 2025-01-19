@@ -6,13 +6,12 @@
   />
   <div class="profile-container">
     <a-row justify="center" class="profile-content-wrapper">
-      <!-- Profile Card -->
       <div class="profile-card">
         <div class="profile-avatar-wrapper">
           <a-avatar
-            class="profile-avatar"
+            class="profile-avatar primary-border-color"
             :size="100"
-            :src="profileImage || defaultImage"
+            :src="userData.imageProfile || defaultImage"
           />
           <div class="upload-icon" @click="triggerFileUpload">
             <CameraFilled />
@@ -26,15 +25,14 @@
           />
         </div>
         <div>
-          <h3>Samon Rotha</h3>
-          <p class="sub-title">samonrotha@gmail.com</p>
+          <h3>{{ userData?.firstName || "User" }} {{ userData?.lastName }}</h3>
+          <p class="sub-title">{{ userData?.email }}</p>
           <div class="action-buttons">
             <a-button danger class="delete-button">Delete Profile</a-button>
           </div>
         </div>
       </div>
 
-      <!-- Profile Details -->
       <a-col class="profile-details">
         <h3>Profile Details</h3>
         <a-form
@@ -43,14 +41,14 @@
           @submit.prevent="onSubmit"
         >
           <section class="flex-form-group">
-            <!-- First Name -->
             <InputForm
+              :initial-value="userData?.firstName || ''"
               name="firstName"
               placeholder="First Name"
               label="First Name"
             />
-            <!-- Last Name -->
             <InputForm
+              :initial-value="userData?.lastName || ''"
               name="lastName"
               placeholder="Last Name"
               label="Last Name"
@@ -58,7 +56,6 @@
           </section>
 
           <div class="flex-form-group">
-            <!-- Gender -->
             <a-form-item
               class="w-full"
               label="Gender"
@@ -68,24 +65,34 @@
               <a-select v-model:value="gender" placeholder="Select Gender">
                 <a-select-option value="male">Male</a-select-option>
                 <a-select-option value="female">Female</a-select-option>
-                <a-select-option value="other">Other</a-select-option>
               </a-select>
             </a-form-item>
 
-            <!-- Date of Birth -->
-            <DatePickerForm
-              name="dateOfBirth"
+            <!-- <a-form-item
               label="Date of Birth"
-              placeholder="Select your date of birth"
-            />
+              :validate-status="errors.dateOfBirth ? 'error' : ''"
+              :help="errors.dateOfBirth"
+              class="w-full"
+            >
+              <input
+                type="date"
+                :name="'dateOfBirth'"
+                :value="formatDate(userData?.dateOfBirth)"
+                class="input-date w-full"
+                @input="updateDateOfBirth"
+              />
+            </a-form-item> -->
           </div>
 
-          <!-- Email -->
           <a-form-item label="Email">
-            <a-input name="email" placeholder="johndoe@example.com" disabled />
+            <a-input
+              :value="userData?.email || ''"
+              name="email"
+              placeholder="johndoe@example.com"
+              disabled
+            />
           </a-form-item>
 
-          <!-- Submit Button -->
           <a-button type="primary" class="update-button" htmlType="submit">
             Update Profile
           </a-button>
@@ -96,82 +103,90 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect, computed } from "vue";
 import { useForm, useField } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
 import * as z from "zod";
 import InputForm from "@/components/InputForm.vue";
-import DatePickerForm from "@/components/DatePickerForm.vue";
 import { CameraFilled } from "@ant-design/icons-vue";
+import { useUser } from "~/composables/useUser";
 
-// Breadcrumb routes
 const routes = [{ path: "index", breadcrumbName: "Profile" }];
 
-// Profile image and gender
-// const profileImage = ref(null);
 const defaultImage =
-  "https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5MC00NTk4LTk2OTYtNDU3NTJiM2QxNzM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg";
+  "https://www.pngitem.com/pimgs/m/22-223968_default-profile-picture-circle-hd-png-download.png";
 
-// Profile image state
 const profileImage = ref<string | null>(null);
 
-// Define schema with Zod
-const schema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  gender: z.enum(["male", "female", "other"], {
-    message: "Gender is required",
-  }),
-  dateOfBirth: z.string().min(1, "Date of Birth is required"),
-});
-
-// Initialize the form
-const { handleSubmit, errors } = useForm({
-  validationSchema: toFieldValidator(schema),
-});
-
-// Use field for gender since it's not directly tied to an InputForm
-const { value: gender } = useField("gender");
-
 const { userQuery } = useUser();
+const userData = computed(() => userQuery.data.value?.data || {});
 
-const router = useRouter();
-
-// Redirect logic
-watchEffect(() => {
-  if (userQuery.isLoading.value) return; // Wait for the query to finish loading
-
-  if (userQuery.error.value || !userQuery.data.value) {
-    console.error("User not authenticated or an error occurred.");
-    router.push("/login");
-  }
-});
-
-// File upload handling
 const handleFileChange = (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = () => {
-      profileImage.value = reader.result as string; // Ensure profileImage can accept a string
+      profileImage.value = reader.result as string;
     };
     reader.readAsDataURL(file);
   }
 };
 
-// Trigger file upload
 const triggerFileUpload = () => {
   const fileInput = document.querySelector(
     "input[type='file']"
   ) as HTMLInputElement | null;
   if (fileInput) {
-    fileInput.click(); // Safely call the click method
+    fileInput.click();
   }
 };
 
-// Handle form submission
+const schema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  gender: z.string(),
+  dateOfBirth: z.string().min(1, "Date of Birth is required"),
+});
+
+const { handleSubmit, errors } = useForm({
+  validationSchema: toFieldValidator(schema),
+});
+
+const { value: gender } = useField("gender", {
+  initialValue: userData.value?.gender || null,
+});
+
+// const dateOfBirth = ref(userData.value?.dateOfBirth || "");
+const dateOfBirth = ref(userData.value?.dateOfBirth || "");
+
+const loading = ref(true);
+
+watchEffect(() => {
+  if (userData.value) {
+    gender.value = userData.value.gender || null; // Populate gender from userData
+    dateOfBirth.value = userData.value.dateOfBirth || ""; // Populate dateOfBirth from userData
+    loading.value = false; // Mark loading as false
+  }
+});
+
+// const loading = ref(true);
+
+const formatDate = (date: string) => {
+  if (!date) return "";
+  return new Date(date).toISOString().split("T")[0]; // Format as YYYY-MM-DD
+};
+
+const updateDateOfBirth = (event: Event) => {
+  const dateValue = (event.target as HTMLInputElement).value;
+  dateOfBirth.value = dateValue;
+};
+
 const onSubmit = handleSubmit((formValues) => {
-  console.log("Form submitted successfully:", formValues);
+  if (loading.value) return; // Skip validation during loading
+  console.log("Form submitted successfully:", {
+    ...formValues,
+    dateOfBirth: dateOfBirth.value,
+  });
 });
 
 definePageMeta({

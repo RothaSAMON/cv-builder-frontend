@@ -19,13 +19,13 @@ export const useUser = () => {
   });
 
   // Computed properties for easier access
-  const userData = computed(() => userQuery.data.value); // User data
-  const isUserLoaded = computed(() => !!userData.value); // Boolean if user is loaded
+  const userData = computed(() => userQuery.data.value?.data);
+  const isUserLoaded = computed(() => !!userData.value);
 
   //   Update auth store when user data is fetched successfully
   watch(userData, (data) => {
     if (data) {
-      authStore.setUser(data.data); // Update store
+      authStore.setUser(data); // Update store
     }
   });
 
