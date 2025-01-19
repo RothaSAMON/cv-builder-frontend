@@ -8,13 +8,13 @@
     <a-form @submit.prevent="onSubmit" layout="vertical">
       <div class="flex-form-group">
         <InputForm
-          :initial-value="phoneNumber"
+          :initial-value="props.phoneNumber"
           name="personalPhoneNumber"
           placeholder="+855 123 456"
           label="Phone Number"
         />
         <InputForm
-          :initial-value="email"
+          :initial-value="props.email"
           name="personalEmail"
           placeholder="example@gmail.com"
           label="Email"
@@ -23,7 +23,7 @@
 
       <!-- Address Field (Optional) -->
       <TextAreaForm
-        :initial-value="address"
+        :initial-value="props.address"
         name="personalAddress"
         label="Address"
         placeholder="Current address"
@@ -43,6 +43,7 @@ import * as z from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import InputForm from "~/components/InputForm.vue";
 import TextAreaForm from "~/components/TextAreaForm.vue";
+import { useSection } from "~/composables/useSection";
 
 // Define types for the contact props
 interface ContactProps {
@@ -64,7 +65,7 @@ const schema = z.object({
 });
 
 // Initialize the form with validation schema and initial values
-const { handleSubmit, values, setFieldValue } = useForm({
+const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(schema),
   initialValues: {
     personalPhoneNumber: props.phoneNumber || "", // Initialize with the prop value
@@ -73,13 +74,40 @@ const { handleSubmit, values, setFieldValue } = useForm({
   },
 });
 
-const onSubmit = handleSubmit((data) => {
-  console.log("Form submitted successfully:", data);
+// Initialize Patch Function
+const { updateSection } = useSection(); // Reuse the `updateSection` mutation
+
+// Form Submission
+const onSubmit = handleSubmit(async (data) => {
+  // Create the formatted payload
+  const requestBody = {
+    type: "Contact", // Fixed type
+    content: {
+      phoneNumber: data.personalPhoneNumber,
+      email: data.personalEmail,
+      address: data.personalAddress,
+    },
+  };
+
+  try {
+    // Send the correctly formatted payload to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: "678b5c8f0845662ccece9520", // Example CV ID (replace with the correct ID)
+      updateContent: requestBody, // Send the full `requestBody` object
+    });
+
+    console.log("Successfully updated contact information:", response);
+  } catch (error) {
+    console.error("Error updating contact information:", error);
+  }
+
+  // Log the formatted payload for debugging
+  console.log("Submitted Payload:", requestBody);
 });
 </script>
 
 <style scoped>
-.form-row {
+.flex-form-group {
   display: flex;
   align-items: flex-start;
   gap: 12px;
