@@ -12,11 +12,11 @@ export interface User {
 }
 
 export interface Tokens {
-  accessToken: string;
-  refreshToken: string;
+  token: string;
 }
 
 export type LoginType = z.infer<typeof loginSchema>;
+export type SignupType = z.infer<typeof signUpSchema>;
 
 export interface AuthResponse {
   data: Tokens;

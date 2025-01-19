@@ -106,6 +106,16 @@ const goToResume = (resumeId: string) => {
 const createResume = () => {
   console.log("Create Resume clicked");
 };
+
+const hasError = computed(() => cvQueryAll.isError.value);
+
+watchEffect(() => {
+  if (hasError.value) {
+    console.error("Error fetching resumes. Redirecting to login.");
+    router.push("/login");
+  }
+});
+
 </script>
 
 <style scoped>

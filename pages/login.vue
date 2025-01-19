@@ -49,23 +49,41 @@
 <script setup lang="ts">
 import { useForm } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
-import * as z from "zod";
-
-// Define the Zod schema
-const schema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+import { useAlertStore } from "~/store/alertStore";
 
 // Initialize Vee Validate with the schema
 const { handleSubmit } = useForm({
-  validationSchema: toFieldValidator(schema),
+  validationSchema: toFieldValidator(loginSchema),
 });
 
+const { loginMutation } = useAuth();
+
+const alertStore = useAlertStore();
+
 // Handle form submission
-const onSubmit = handleSubmit((values) => {
-  console.log("Login successful with values:", values);
+const onSubmit = handleSubmit(async (values) => {
   // Add login logic (e.g., API call)
+  try {
+    const result = await loginMutation.mutateAsync({
+      email: values.email,
+      password: values.password,
+    });
+
+    if (result) {
+      alertStore.showAlert({
+        message: result.message,
+        type: "success",
+        duration: 5000,
+      });
+      navigateTo("/dashboard");
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
+  }
 });
 
 // Page metadata

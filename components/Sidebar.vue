@@ -51,7 +51,8 @@ import {
   LogoutOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons-vue";
-import { ref } from "vue";
+
+const { logoutMutation } = useAuth();
 
 const isModalVisible = ref(false);
 const warningIcon = ExclamationCircleOutlined;
@@ -60,9 +61,22 @@ const showLogoutModal = () => {
   isModalVisible.value = true;
 };
 
-const handleLogout = () => {
-  console.log("Logged out");
-  isModalVisible.value = false;
+const handleLogout = async () => {
+  try {
+    const data = await logoutMutation.mutateAsync();
+
+    if (data) {
+      // alertStore.showAlert({
+      //   message: data.message,
+      //   type: "success",
+      //   duration: 5000,
+      // });
+      navigateTo("/login");
+    }
+  } catch (error: any) {
+    // authStore.setMessage(error.data.message);
+    console.error("Error logging in", error);
+  }
 };
 
 const handleCancel = () => {
@@ -93,5 +107,4 @@ const handleCancel = () => {
   background-color: var(--secondary-background-color) !important;
   color: white;
 }
-
 </style>

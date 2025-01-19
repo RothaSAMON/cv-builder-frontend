@@ -1,4 +1,5 @@
 <template>
+  <CustomAlert />
   <a-layout class="main-layout-container">
     <Sidebar />
     <a-layout class="layout-container">
@@ -10,7 +11,24 @@
   </a-layout>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAlertStore } from "~/store/alertStore";
+
+// Fetch user data directly in the layout
+const alertStore = useAlertStore();
+
+const { userQuery } = useUser();
+
+const { data, error } = userQuery;
+
+if (data) {
+  console.log("User auth", data);
+}
+
+if (error.value) {
+  navigateTo("/login");
+}
+</script>
 <style scoped>
 .main-layout-container {
   background-color: white !important;

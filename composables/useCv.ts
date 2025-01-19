@@ -3,25 +3,31 @@ import axios from "axios";
 import type { CVType } from "~/types/cv";
 
 export const useCV = () => {
+
+  const {$api} = useNuxtApp()
   const config = useRuntimeConfig();
+
   const baseURL = config.public.myApiUrl;
 
   const cvQueryAll = useQuery({
     queryKey: ["cv"],
     queryFn: async () => {
-      const response = await axios.get<CVType[]>(`${baseURL}/cvs`);
-      // Return the entire response since you need it all
+      const response = await $api.get<CVType[]>(`${baseURL}/cvs`);
       return response.data;
     },
+    retry: false, // Disable automatic retries on failure
+    refetchOnWindowFocus: false, // Prevent refetch when the window gains focus
   });
+  
 
   // Fetch CVs by specific user ID
   const fetchCVsByUserId = (userId: string) =>
     useQuery({
       queryKey: ["cv", userId],
       queryFn: async () => {
-        const response = await axios.get<CVType[]>(
-          `${baseURL}/cvs?userId=${userId}`
+        const response = await $api.get<CVType[]>(
+          // `${baseURL}/cvs?userId=${userId}`
+          `${baseURL}/cvs`
         );
         return response.data;
       },
@@ -33,7 +39,7 @@ export const useCV = () => {
     useQuery({
       queryKey: ["cv", cvId],
       queryFn: async () => {
-        const response = await axios.get<CVType>(`${baseURL}/cvs/${cvId}`);
+        const response = await $api.get<CVType>(`${baseURL}/cvs/${cvId}`);
         return response.data;
       },
       enabled: !!cvId, // Only fetch if cvId is provided

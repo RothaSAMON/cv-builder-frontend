@@ -226,6 +226,8 @@ const dummyData = reactive({
   profileImage:
     "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
 });
+
+
 </script>
 
 <style scoped>
@@ -293,8 +295,9 @@ const dummyData = reactive({
   width: 460px;
 }
 
-/* .right-container {
-} */
+.right-container {
+  margin-left: 24px;
+}
 
 .educations-section p,
 .reference-section p,
