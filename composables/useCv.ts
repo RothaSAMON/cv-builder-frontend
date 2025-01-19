@@ -68,5 +68,19 @@ export const useCV = () => {
       },
     });
 
-  return { cvQueryAll, fetchCVsByUserId, fetchCVById, updateCV };
+  const createCV = useMutation({
+    mutationFn: async (formData: { title: string; templateUrl: string }) => {
+      const response = await $api.post(`${baseURL}/cvs`, formData);
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log("Successfully created CV!");
+      // queryClient.invalidateQueries(["cv"]); // Refetch the list of CVs
+    },
+    onError: (error) => {
+      console.error("Error creating CV", error);
+    },
+  });
+
+  return { cvQueryAll, fetchCVsByUserId, fetchCVById, updateCV, createCV };
 };

@@ -8,9 +8,7 @@
 
       <!-- Create Button (conditionally rendered) -->
       <div class="create-button-container" v-if="showCreateButton">
-        <a-button type="primary" @click="createResume">
-          <PlusOutlined /> Create
-        </a-button>
+        <DashboardCreateCvButton />
       </div>
     </section>
 
@@ -70,19 +68,20 @@ import { useCV } from "../../composables/useCv";
 defineProps({
   showCreateButton: {
     type: Boolean,
-    default: true, // Default value to show the button
+    default: true,
   },
 });
 
-const { cvQueryAll } = useCV();
+const { cvQueryAll, createCV } = useCV();
 const router = useRouter();
+
+// Create CV Mutation
+// const { mutate: createCVMutation } = createCV();
 
 // Fetch data from API
 const cvData = computed(() => cvQueryAll.data.value || []);
 
-// console.log("My data", cvQueryAll.data)
-
-const itemsPerPage = 10;
+const itemsPerPage = 100;
 const currentPage = ref(1);
 
 // Paginated resumes based on current page
@@ -102,9 +101,35 @@ const goToResume = (resumeId: string) => {
   router.push(`/resumes/${resumeId}`);
 };
 
-// Handle Create button
+// Create a new resume with default data
 const createResume = () => {
-  console.log("Create Resume clicked");
+  const defaultData = {
+    title: "Untitled",
+    previewImageUrl:
+      "https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT.jpg",
+    templateUrl:
+      "https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT.jpg",
+  };
+
+  console.log("Creating CV with the following data:", defaultData);
+
+  const formData = new FormData();
+  formData.append("title", defaultData.title);
+  formData.append("previewImageUrl", defaultData.previewImageUrl);
+  formData.append("templateUrl", defaultData.templateUrl);
+
+  //   createCVMutation(formData, {
+  //     onSuccess: (response) => {
+  //       console.log("Resume created successfully!", response);
+
+  //       // Navigate to the newly created resume's detail page
+  //       const resumeId = response?.data?._id || "678b5f6cef831fcc10b8cde3"; // Replace with actual response data structure
+  //       router.push(`/resumes/${resumeId}`);
+  //     },
+  //     onError: (error) => {
+  //       console.error("Error creating resume", error);
+  //     },
+  //   });
 };
 
 const hasError = computed(() => cvQueryAll.isError.value);
@@ -115,7 +140,6 @@ watchEffect(() => {
     router.push("/login");
   }
 });
-
 </script>
 
 <style scoped>

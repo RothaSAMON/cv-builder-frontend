@@ -1,10 +1,14 @@
 <template>
   <div class="container">
-    <DashboardPageHeader
+    <!-- <DashboardPageHeader
       title="Resumes Action"
       subTitle="Create your resumes to find a job"
       :breadcrumbRoutes="routes"
-    />
+    /> -->
+
+    <section class="resume-title-section">
+      <h2>Untitled</h2>
+    </section>
 
     <!-- Loading and Error States -->
     <div v-if="isLoading" class="loading-state">Loading...</div>
@@ -131,8 +135,8 @@ const routes = [
   { path: "/resumes/:id", breadcrumbName: "Resumes Action" },
 ];
 definePageMeta({
-  layout: "default"
-})
+  layout: "default",
+});
 
 // Template selection
 const template1 =
