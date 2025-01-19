@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useAuthStore } from "~/store/auth";
 import type { User } from "~/types/auth";
 import type { JsonResponseType } from "~/types/json";
@@ -50,7 +50,24 @@ export const useUser = () => {
     }
   );
 
+  // Update User Data
+  const updateUser = useMutation({
+    mutationFn: async (updatedData: User) => {
+      const response = await $api.put<JsonResponseType<User>>(
+        "/profile",
+        updatedData
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the user data after a successful update
+      // queryClient.invalidateQueries(["user"]);
+      console.log("Successfully updated user data!");
+    },
+  });
+
   return {
     userQuery,
+    updateUser,
   };
 };

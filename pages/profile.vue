@@ -67,21 +67,6 @@
                 <a-select-option value="female">Female</a-select-option>
               </a-select>
             </a-form-item>
-
-            <!-- <a-form-item
-              label="Date of Birth"
-              :validate-status="errors.dateOfBirth ? 'error' : ''"
-              :help="errors.dateOfBirth"
-              class="w-full"
-            >
-              <input
-                type="date"
-                :name="'dateOfBirth'"
-                :value="formatDate(userData?.dateOfBirth)"
-                class="input-date w-full"
-                @input="updateDateOfBirth"
-              />
-            </a-form-item> -->
           </div>
 
           <a-form-item label="Email">
@@ -93,7 +78,11 @@
             />
           </a-form-item>
 
-          <a-button type="primary" class="update-button" htmlType="submit">
+          <a-button
+            type="primary"
+            class="update-button"
+            htmlType="submit"
+          >
             Update Profile
           </a-button>
         </a-form>
@@ -118,7 +107,7 @@ const defaultImage =
 
 const profileImage = ref<string | null>(null);
 
-const { userQuery } = useUser();
+const { userQuery, updateUser } = useUser(); // Import updateUser
 const userData = computed(() => userQuery.data.value?.data || {});
 
 const handleFileChange = (event: Event) => {
@@ -144,7 +133,7 @@ const triggerFileUpload = () => {
 const schema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  gender: z.string(),
+  gender: z.string().min(1, "Gender is required"),
   dateOfBirth: z.string().min(1, "Date of Birth is required"),
 });
 
@@ -156,24 +145,21 @@ const { value: gender } = useField("gender", {
   initialValue: userData.value?.gender || null,
 });
 
-// const dateOfBirth = ref(userData.value?.dateOfBirth || "");
 const dateOfBirth = ref(userData.value?.dateOfBirth || "");
 
 const loading = ref(true);
 
 watchEffect(() => {
   if (userData.value) {
-    gender.value = userData.value.gender || null; // Populate gender from userData
-    dateOfBirth.value = userData.value.dateOfBirth || ""; // Populate dateOfBirth from userData
-    loading.value = false; // Mark loading as false
+    gender.value = userData.value.gender || null;
+    dateOfBirth.value = userData.value.dateOfBirth || "";
+    loading.value = false;
   }
 });
 
-// const loading = ref(true);
-
 const formatDate = (date: string) => {
   if (!date) return "";
-  return new Date(date).toISOString().split("T")[0]; // Format as YYYY-MM-DD
+  return new Date(date).toISOString().split("T")[0];
 };
 
 const updateDateOfBirth = (event: Event) => {
@@ -181,12 +167,26 @@ const updateDateOfBirth = (event: Event) => {
   dateOfBirth.value = dateValue;
 };
 
-const onSubmit = handleSubmit((formValues) => {
-  if (loading.value) return; // Skip validation during loading
-  console.log("Form submitted successfully:", {
+const onSubmit = handleSubmit(async (formValues) => {
+  console.log("Submit button clicked!"); // Add this to confirm the function is called
+  if (loading.value) {
+    console.warn("Form submission blocked because the data is still loading.");
+    return;
+  }
+
+  const payload = {
     ...formValues,
-    dateOfBirth: dateOfBirth.value,
-  });
+    // dateOfBirth: dateOfBirth.value,
+  };
+
+  console.log("Payload to be sent:", payload);
+
+  try {
+    await updateUser.mutateAsync(payload);
+    console.log("Profile updated successfully");
+  } catch (error) {
+    console.error("Error updating profile:", error);
+  }
 });
 
 definePageMeta({
