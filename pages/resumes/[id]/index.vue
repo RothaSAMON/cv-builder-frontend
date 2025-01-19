@@ -131,7 +131,7 @@ const routes = [
   { path: "/resumes/:id", breadcrumbName: "Resumes Action" },
 ];
 definePageMeta({
-  layout: "dashboard"
+  layout: "default"
 })
 
 // Template selection
@@ -175,6 +175,18 @@ const handleSubmit = () => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.right-section {
+  flex: 2;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
 }
 
 .template-selection {
