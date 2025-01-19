@@ -160,10 +160,32 @@ const updateEndDate = (event: Event, index: number) => {
   value.endDate = newEndDate;
 };
 
+const { updateSection } = useSection();
+
 // Submit form handler
-const onSubmit = handleSubmit((data) => {
-  console.log("Submitted data:", data);
-  // Do not reset the form here
+const onSubmit = handleSubmit(async (data) => {
+  const requestBody = {
+    type: "Education",
+    content: data.fields.map((fields) => ({
+      schoolName: fields.schoolName,
+      degreeMajor: fields.degreeMajor,
+      startDate: fields.startDate,
+      endDate: fields.endDate,
+    })),
+  };
+
+  try {
+    const response = await updateSection.mutateAsync({
+      cvId: "678b5c8f0845662ccece9520",
+      updateContent: requestBody,
+    });
+
+    console.log("Successfully updated education:", response);
+  } catch (error) {
+    console.error("Error updating education:", error);
+  }
+
+  console.log("Submitted Payload:", requestBody);
 });
 </script>
 
