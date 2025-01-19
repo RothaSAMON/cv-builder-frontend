@@ -12,11 +12,22 @@
 </template>
 
 <script setup lang="ts">
-import { useAlertStore } from '~/store/alertStore';
+import { useAlertStore } from "~/store/alertStore";
 
 // Fetch user data directly in the layout
-const alertStore = useAlertStore()
+const alertStore = useAlertStore();
 
+const { userQuery } = useUser();
+
+const { data, error } = userQuery;
+
+if (data) {
+  console.log("User auth", data);
+}
+
+if (error.value) {
+  navigateTo("/login");
+}
 </script>
 <style scoped>
 .main-layout-container {
