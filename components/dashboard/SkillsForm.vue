@@ -61,6 +61,7 @@ import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
 import type { UpdateSkillContent } from "~/types/section";
+import { useSection } from "~/composables/useSection";
 
 // Define the validation schema
 const SkillSchema = z.object({
@@ -75,7 +76,7 @@ const FormSchema = z.object({
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: [], // This will be populated dynamically from parent data
+    fields: [], // Populated dynamically from parent props
   },
 });
 
@@ -90,16 +91,43 @@ const removeField = (index: number) => {
   remove(index);
 };
 
-const onSubmit = handleSubmit((data) => {
-  console.log("Submitted data:", data);
-});
-
 const props = defineProps<{ skills: UpdateSkillContent[] }>();
+
+// Populate initial skills
 if (props.skills) {
   props.skills.forEach((skill) => {
     push({ skill: skill.name, level: skill.level });
   });
 }
+
+// Initialize patch functionality
+const { updateSection } = useSection();
+
+const onSubmit = handleSubmit(async (data) => {
+  // Format the payload
+  const requestBody = {
+    type: "Skills", // Fixed type
+    content: data.fields.map((field) => ({
+      name: field.skill,
+      level: field.level,
+    })),
+  };
+
+  try {
+    // Send the formatted payload to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: "678b5c8f0845662ccece9520", // Example CV ID (replace with your ID)
+      updateContent: requestBody,
+    });
+
+    console.log("Successfully updated skills:", response);
+  } catch (error) {
+    console.error("Error updating skills:", error);
+  }
+
+  // Log the submitted payload for debugging
+  console.log("Submitted Payload:", requestBody);
+});
 </script>
 
 <style scoped>
