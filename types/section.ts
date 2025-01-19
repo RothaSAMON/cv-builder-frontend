@@ -25,9 +25,11 @@ export interface UpdateSkillContent {
 // Type for Experience Content
 export interface UpdateExperienceContent {
   jobTitle?: string;
-  responsibilities?: string[];
-  startDate?: Date;
-  endDate?: Date;
+  // responsibilities?: string[];
+  startDate?: string;
+  endDate?: string;
+  position?: string;
+  description?: string;
 }
 
 // Type for Education Content
