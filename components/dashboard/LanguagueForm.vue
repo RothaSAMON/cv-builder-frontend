@@ -64,48 +64,76 @@ import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
 import type { UpdateLanguageContent } from "~/types/section";
+import { useSection } from "~/composables/useSection";
 
-// Define the validation schema
+// Validation schema for each language field
 const LanguageSchema = z.object({
   language: z.string().min(1, "Language is required"),
-  level: z.string().min(1, "Level is required"), // Validate that level is selected
+  level: z.string().min(1, "Level is required"), // Ensure a level is selected
 });
 
 const FormSchema = z.object({
   fields: z.array(LanguageSchema),
 });
 
-// Initialize form with validation
+// Initialize the form with validation
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: [], // This will be populated dynamically from parent data
+    fields: [], // Populated dynamically from props
   },
 });
 
-// Dynamically set initial values with languages data from parent (cvData)
+// Dynamic field management
 const { fields, push, remove } = useFieldArray("fields");
 
+// Add new language field
 const addField = () => {
   push({ language: "", level: "" });
 };
 
+// Remove a language field
 const removeField = (index: number) => {
   remove(index);
 };
 
-const onSubmit = handleSubmit((data) => {
-  console.log("Submitted data:", data);
-});
-
-// Props for languages passed from parent
+// Props for preloaded language data
 const props = defineProps<{ languages: UpdateLanguageContent[] }>();
-// Initialize form fields with languages data
-if (props.languages && props.languages.length > 0) {
+
+// Populate initial fields with preloaded data
+if (props.languages) {
   props.languages.forEach((language) => {
     push({ language: language.language, level: language.level });
   });
 }
+
+// Patch functionality
+const { updateSection } = useSection();
+
+const onSubmit = handleSubmit(async (data) => {
+  // Format payload for the backend
+  const requestBody = {
+    type: "Languages", // Fixed type
+    content: data.fields.map((field) => ({
+      language: field.language,
+      level: field.level,
+    })),
+  };
+
+  try {
+    // Send the formatted data to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: "678b5c8f0845662ccece9520", // Example CV ID (replace with dynamic value)
+      updateContent: requestBody,
+    });
+
+    console.log("Successfully updated languages:", response);
+  } catch (error) {
+    console.error("Error updating languages:", error);
+  }
+
+  console.log("Submitted Payload:", requestBody);
+});
 </script>
 
 <style scoped>
