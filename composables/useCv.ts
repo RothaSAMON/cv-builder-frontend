@@ -1,11 +1,16 @@
-import { useQuery } from "@tanstack/vue-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/vue-query";
 import axios from "axios";
 import type { CVType } from "~/types/cv";
 
 export const useCV = () => {
-
-  const {$api} = useNuxtApp()
+  const { $api } = useNuxtApp();
   const config = useRuntimeConfig();
+  const queryClient = useQueryClient();
 
   const baseURL = config.public.myApiUrl;
 
@@ -18,7 +23,6 @@ export const useCV = () => {
     retry: false, // Disable automatic retries on failure
     refetchOnWindowFocus: false, // Prevent refetch when the window gains focus
   });
-  
 
   // Fetch CVs by specific user ID
   const fetchCVsByUserId = (userId: string) =>
@@ -45,5 +49,24 @@ export const useCV = () => {
       enabled: !!cvId, // Only fetch if cvId is provided
     });
 
-  return { cvQueryAll, fetchCVsByUserId, fetchCVById };
+  const updateCV = (cvId: string, updatedData: Partial<CVType>) =>
+    useMutation({
+      mutationFn: async () => {
+        const response = await $api.patch<CVType>(
+          `${baseURL}/cvs/${cvId}`,
+          updatedData
+        );
+        return response.data;
+      },
+      onSuccess: () => {
+        // Invalidate and refetch the CV data after a successful patch
+        // queryClient.invalidateQueries(["CV", cvId])
+        console.log("Succesfully Updated Data!!");
+      },
+      onError: (error) => {
+        console.error("Error updating CV", error);
+      },
+    });
+
+  return { cvQueryAll, fetchCVsByUserId, fetchCVById, updateCV };
 };

@@ -72,6 +72,7 @@ import { toFieldValidator } from "@vee-validate/zod";
 import * as z from "zod";
 import InputForm from "~/components/InputForm.vue";
 import TextAreaForm from "~/components/TextAreaForm.vue";
+import { useSection } from "~/composables/useSection";
 
 // Props Definition
 interface DashboardPersonalDetailsFormProps {
@@ -116,10 +117,48 @@ const handleChange = (info: any) => {
   reader.readAsDataURL(info.file.originFileObj);
 };
 
+// Initialize Patch Function
+const { updateSection } = useSection();
+
+// Define the UpdatePersonalContent type here
+type UpdatePersonalContent = {
+  firstName: string;
+  lastName: string;
+  position?: string;
+  summary?: string;
+  imageUrl?: string;
+};
+
 // Form Submission
-const onSubmit = handleSubmit((values) => {
-  console.log("Form submitted with values:", values);
+const onSubmit = handleSubmit(async (values) => {
+  // Create the updated section data in the required format
+  const requestBody = {
+    type: "PersonalDetail", // Fixed type
+    content: {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      position: values.personalPosition,
+      summary: values.personalSummary,
+      imageUrl: imageUrl.value || "", // Use the uploaded image URL or default to an empty string
+    },
+  };
+
+  try {
+    // Send the correctly formatted data to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: "678b5c8f0845662ccece9520", // Example CV ID
+      updateContent: requestBody, // Send the entire requestBody as required
+    });
+
+    console.log("Successfully updated section:", response);
+  } catch (error) {
+    console.error("Error updating personal details:", error);
+  }
+
+  // Log the final payload for verification
+  console.log("Submitted Payload:", requestBody);
 });
+
 </script>
 
 <style scoped>
