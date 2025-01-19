@@ -104,7 +104,7 @@ const handleCancel = () => {
 
 /* Change the background color of the arrow icon */
 :deep(.ant-layout-sider-trigger) {
-  background-color: var(--secondary-background-color) !important;
+  background-color: #2977FF;
   color: white;
 }
 </style>

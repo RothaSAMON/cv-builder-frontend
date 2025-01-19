@@ -12,13 +12,12 @@
     <!-- Modal Component -->
     <a-modal
       v-model:visible="isModalVisible"
-      title="Create Resume"
       @ok="handleOk"
       @cancel="handleCancel"
     >
       <!-- Resume Title Form -->
       <a-form :layout="'vertical'">
-        <InputForm name="title" label="Resume Title" />
+        <InputForm placeholder="Title" name="title" label="Resume Title" />
       </a-form>
 
       <!-- Image Template Selection -->

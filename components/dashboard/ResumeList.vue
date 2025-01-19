@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="list-container">
     <section class="list-header">
       <!-- Title for the resume list -->
       <p class="resume-des">
@@ -14,14 +14,13 @@
 
     <!-- Resume Cards -->
     <a-row :gutter="16">
-      <!-- Dynamically render fetched resumes -->
       <a-col
-        v-for="resume in paginatedResumes"
+        v-for="resume in displayedResumes"
         :key="resume._id"
         :span="8"
         @click="goToResume(resume._id)"
       >
-        <a-card :hoverable="true">
+        <a-card class="card" :hoverable="true">
           <a-row align="middle" justify="center">
             <!-- Resume Preview Image -->
             <a-col :span="24" class="image-container">
@@ -48,19 +47,17 @@
       </a-col>
     </a-row>
 
-    <!-- Pagination -->
-    <a-pagination
-      :current="currentPage"
-      :pageSize="itemsPerPage"
-      @change="onPageChange"
-      class="pagination"
-    />
+    <!-- See More Button -->
+    <div v-if="hasMoreData" class="see-more-container">
+      <a-button type="primary" @click="loadMore">
+        See More
+      </a-button>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { PlusOutlined } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import { useCV } from "../../composables/useCv";
 
@@ -72,28 +69,25 @@ defineProps({
   },
 });
 
-const { cvQueryAll, createCV } = useCV();
+const { cvQueryAll } = useCV();
 const router = useRouter();
-
-// Create CV Mutation
-// const { mutate: createCVMutation } = createCV();
 
 // Fetch data from API
 const cvData = computed(() => cvQueryAll.data.value || []);
 
-const itemsPerPage = 100;
-const currentPage = ref(1);
+// Lazy loading settings
+const itemsPerLoad = 6; // Number of items to load per click
+const displayedCount = ref(itemsPerLoad); // Number of resumes currently displayed
 
-// Paginated resumes based on current page
-const paginatedResumes = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  return cvData.value.slice(startIndex, endIndex);
-});
+// Computed property to get displayed resumes
+const displayedResumes = computed(() => cvData.value.slice(0, displayedCount.value));
 
-// Change page
-const onPageChange = (page: number) => {
-  currentPage.value = page;
+// Determine if there's more data to load
+const hasMoreData = computed(() => displayedCount.value < cvData.value.length);
+
+// Load more resumes
+const loadMore = () => {
+  displayedCount.value += itemsPerLoad;
 };
 
 // Navigate to specific resume detail page
@@ -101,37 +95,7 @@ const goToResume = (resumeId: string) => {
   router.push(`/resumes/${resumeId}`);
 };
 
-// Create a new resume with default data
-const createResume = () => {
-  const defaultData = {
-    title: "Untitled",
-    previewImageUrl:
-      "https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT.jpg",
-    templateUrl:
-      "https://cv-design-assets-images.s3.ap-southeast-2.amazonaws.com/template/ResumeTemplateRT.jpg",
-  };
-
-  console.log("Creating CV with the following data:", defaultData);
-
-  const formData = new FormData();
-  formData.append("title", defaultData.title);
-  formData.append("previewImageUrl", defaultData.previewImageUrl);
-  formData.append("templateUrl", defaultData.templateUrl);
-
-  //   createCVMutation(formData, {
-  //     onSuccess: (response) => {
-  //       console.log("Resume created successfully!", response);
-
-  //       // Navigate to the newly created resume's detail page
-  //       const resumeId = response?.data?._id || "678b5f6cef831fcc10b8cde3"; // Replace with actual response data structure
-  //       router.push(`/resumes/${resumeId}`);
-  //     },
-  //     onError: (error) => {
-  //       console.error("Error creating resume", error);
-  //     },
-  //   });
-};
-
+// Error handling for API fetch
 const hasError = computed(() => cvQueryAll.isError.value);
 
 watchEffect(() => {
@@ -143,6 +107,10 @@ watchEffect(() => {
 </script>
 
 <style scoped>
+.list-container {
+  margin: 24px 0;
+}
+
 .resume-des {
   text-align: start;
 }
@@ -163,7 +131,7 @@ watchEffect(() => {
   margin-top: 12px;
 }
 
-.pagination {
+.see-more-container {
   margin-top: 20px;
   text-align: center;
 }
@@ -178,5 +146,9 @@ watchEffect(() => {
   justify-content: space-between;
   align-items: end;
   margin: 16px 0px;
+}
+
+.card {
+  margin: 12px 0;
 }
 </style>
