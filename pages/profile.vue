@@ -67,6 +67,21 @@
                 <a-select-option value="female">Female</a-select-option>
               </a-select>
             </a-form-item>
+
+            <a-form-item
+              label="Date of Birth"
+              :validate-status="'error'"
+              :help="errors.dateOfBirth"
+              class="w-full"
+            >
+              <input
+                type="date"
+                :name="'dateOfBirth'"
+                :value="formatDate(userData?.dateOfBirth as string)"
+                class="input-date w-full"
+                @input="updateDateOfBirth"
+              />
+            </a-form-item>
           </div>
 
           <a-form-item label="Email">
@@ -78,11 +93,7 @@
             />
           </a-form-item>
 
-          <a-button
-            type="primary"
-            class="update-button"
-            htmlType="submit"
-          >
+          <a-button type="primary" class="update-button" html-type="submit">
             Update Profile
           </a-button>
         </a-form>
@@ -130,11 +141,18 @@ const triggerFileUpload = () => {
   }
 };
 
+// Form Data
+const formData = ref({
+  firstName: userData?.value.firstName || "",
+  lastName: userData?.value.lastName || "",
+  email: userData?.value.email || "",
+});
+
 const schema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  gender: z.string().min(1, "Gender is required"),
-  dateOfBirth: z.string().min(1, "Date of Birth is required"),
+  gender: z.string().optional(),
+  dateOfBirth: z.string().optional(),
 });
 
 const { handleSubmit, errors } = useForm({
@@ -167,8 +185,8 @@ const updateDateOfBirth = (event: Event) => {
   dateOfBirth.value = dateValue;
 };
 
+// Form Submission
 const onSubmit = handleSubmit(async (formValues) => {
-  console.log("Submit button clicked!"); // Add this to confirm the function is called
   if (loading.value) {
     console.warn("Form submission blocked because the data is still loading.");
     return;
@@ -176,9 +194,11 @@ const onSubmit = handleSubmit(async (formValues) => {
 
   const payload = {
     ...formValues,
-    // dateOfBirth: dateOfBirth.value,
+    gender: gender.value as string,
+    dateOfBirth: dateOfBirth.value,
   };
 
+  console.log("Form values:", formValues);
   console.log("Payload to be sent:", payload);
 
   try {
