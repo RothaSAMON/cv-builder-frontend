@@ -8,19 +8,21 @@
       class="resume-template"
       :style="{ backgroundImage: 'url(' + selectedTemplate + ')' }"
     >
-      <!-- Profile Image -->
-      <NuxtImg
-        class="profile-image"
-        :style="{ backgroundImage: 'url(' + personalSection?.imageUrl + ')' }"
-      />
+      <div class="header-resume">
+        <!-- Profile Image -->
+        <NuxtImg
+          class="profile-image"
+          :style="{ backgroundImage: 'url(' + personalSection?.imageUrl + ')' }"
+        />
 
-      <!-- Dummy data overlay on resume -->
-      <section class="personal-detail">
-        <h2 class="name-section">
-          {{ personalSection?.firstName }} {{ personalSection?.lastName }}
-        </h2>
-        <h3 class="title-section">{{ personalSection?.position }}</h3>
-      </section>
+        <!-- Dummy data overlay on resume -->
+        <section class="personal-detail">
+          <h2 class="name-section">
+            {{ personalSection?.firstName }} {{ personalSection?.lastName }}
+          </h2>
+          <h3 class="title-section">{{ personalSection?.position }}</h3>
+        </section>
+      </div>
 
       <div class="content-container">
         <!-- The left side of Resume -->
@@ -28,8 +30,8 @@
           <section class="contact-section">
             <h3 class="section-title">Contact Me</h3>
             <p>{{ contactSection?.phoneNumber }}</p>
-            <p>{{ contactSection.email }}</p>
-            <p>{{ contactSection.address }}</p>
+            <p>{{ contactSection?.email }}</p>
+            <p>{{ contactSection?.address }}</p>
             <hr />
           </section>
 
@@ -37,8 +39,8 @@
             <h3 class="section-title">Skills</h3>
             <ul>
               <li v-for="(skill, index) in skillsSection" :key="index">
-                <span class="skill-name">{{ skill.name }}</span> :
-                <span class="skill-level">{{ skill.level }}</span>
+                <span class="skill-name">{{ skill?.name }}</span> :
+                <span class="skill-level">{{ skill?.level }}</span>
               </li>
             </ul>
             <hr />
@@ -48,8 +50,8 @@
             <h3 class="section-title">Language</h3>
             <ul>
               <li v-for="(language, index) in languageSection" :key="index">
-                <span class="language-name">{{ language.language }}</span> :
-                <span class="language-level">{{ language.level }}</span>
+                <span class="language-name">{{ language?.language }}</span> :
+                <span class="language-level">{{ language?.level }}</span>
               </li>
             </ul>
             <hr />
@@ -59,11 +61,11 @@
             <h3 class="section-title">Reference</h3>
 
             <div v-for="(reference, index) in referenceSection" :key="index">
-              <p>{{ reference.firstName }} {{ reference.lastName }}</p>
-              <p>{{ reference.company }}</p>
-              <p>{{ reference.position }}</p>
-              <p>{{ reference.email }}</p>
-              <p>{{ reference.phoneNumber }}</p>
+              <p>{{ reference?.firstName }} {{ reference?.lastName }}</p>
+              <p>{{ reference?.company }}</p>
+              <p>{{ reference?.position }}</p>
+              <p>{{ reference?.email }}</p>
+              <p>{{ reference?.phoneNumber }}</p>
               <br />
             </div>
           </section>
@@ -81,11 +83,11 @@
             <h3 class="section-title">Experience</h3>
 
             <div v-for="(experience, index) in experienceSection" :key="index">
-              <p>{{ experience.jobTitle }}</p>
-              <p>{{ experience.position }}</p>
-              <p class="sub-title">{{ experience.description }}</p>
+              <p>{{ experience?.jobTitle }}</p>
+              <p>{{ experience?.position }}</p>
+              <p class="sub-title">{{ experience?.description }}</p>
               <p class="sub-title">
-                {{ experience.startDate }} - {{ experience.endDate }}
+                {{ experience?.startDate }} - {{ experience?.endDate }}
               </p>
               <br />
             </div>
@@ -96,9 +98,11 @@
             <h3 class="section-title">Education</h3>
 
             <div v-for="(education, index) in educationSection" :key="index">
-              <p>{{ education.degreeMajor }}</p>
-              <p class="sub-title">{{ education.schoolName }}</p>
-              <p class="sub-title">{{ education.startDate }} - {{ education.endDate }}</p>
+              <p>{{ education?.degreeMajor }}</p>
+              <p class="sub-title">{{ education?.schoolName }}</p>
+              <p class="sub-title">
+                {{ education?.startDate }} - {{ education?.endDate }}
+              </p>
               <br />
             </div>
           </section>
@@ -225,10 +229,14 @@ const exportAsPDF = async () => {
   margin-bottom: 16px;
 }
 
+.header-resume {
+  height: 100px;
+}
+
 .resume-template {
   position: relative;
   width: 800px;
-  height: 1200px;
+  height: 1120px;
   background-size: cover;
   background-position: center;
   color: white;
@@ -240,7 +248,7 @@ const exportAsPDF = async () => {
 
 .profile-image {
   position: absolute;
-  top: 20px;
+  top: 13px;
   left: 60px;
   width: 130px;
   height: 130px;
@@ -263,7 +271,7 @@ const exportAsPDF = async () => {
 
 .personal-detail {
   margin-left: 220px;
-  margin-top: 20px;
+  margin-top: 13px;
 }
 
 .content-container {

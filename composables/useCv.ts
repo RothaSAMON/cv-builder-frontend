@@ -6,6 +6,7 @@ import {
 } from "@tanstack/vue-query";
 import axios from "axios";
 import type { CVType } from "~/types/cv";
+import type { JsonResponseType } from "~/types/json";
 
 export const useCV = () => {
   const { $api } = useNuxtApp();
@@ -16,8 +17,9 @@ export const useCV = () => {
 
   const cvQueryAll = useQuery({
     queryKey: ["cv"],
+
     queryFn: async () => {
-      const response = await $api.get<CVType[]>(`${baseURL}/cvs`);
+      const response = await $api.get<JsonResponseType<CVType[]>>(`${baseURL}/cvs`);
       return response.data;
     },
     retry: false, // Disable automatic retries on failure

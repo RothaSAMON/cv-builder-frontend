@@ -1,5 +1,5 @@
 <template>
-  <div class="list-container">
+  <div class="list-container primary-border-color">
     <section class="list-header">
       <!-- Title for the resume list -->
       <p class="resume-des">
@@ -38,16 +38,18 @@
 
             <!-- Resume Title and Author -->
             <a-col :span="24" class="title-container">
+              <p class="sub-title">Title:</p>
               <h3>{{ resume.title }}</h3>
-              <p class="sub-title">
-                Created by: {{ resume.userId.firstName }}
-                {{ resume.userId.lastName }}
-              </p>
             </a-col>
           </a-row>
         </a-card>
       </a-col>
     </a-row>
+
+    <div v-if="!cvData || cvData.length === 0" class="no-data-message">
+      <p class="sub-title">No resumes available yet.</p>
+      <img src="@/assets/images/NoData.jpg" alt="No-Data" />
+    </div>
 
     <!-- See More Button -->
     <div v-if="hasMoreData" class="see-more-container">
@@ -73,7 +75,7 @@ const { cvQueryAll } = useCV();
 const router = useRouter();
 
 // Fetch data from API
-const cvData = computed(() => cvQueryAll.data.value || []);
+const cvData = computed(() => cvQueryAll.data.value?.data || []);
 
 // Lazy loading settings
 const itemsPerLoad = 6; // Number of items to load per click
@@ -81,11 +83,15 @@ const displayedCount = ref(itemsPerLoad); // Number of resumes currently display
 
 // Computed property to get displayed resumes
 const displayedResumes = computed(() =>
-  cvData.value.slice(0, displayedCount.value)
+  Array.isArray(cvData.value) ? cvData.value.slice(0, displayedCount.value) : []
 );
 
 // Determine if there's more data to load
-const hasMoreData = computed(() => displayedCount.value < cvData.value.length);
+const hasMoreData = computed(
+  () =>
+    displayedCount.value <
+    (Array.isArray(cvData.value) ? cvData.value.length : 0)
+);
 
 // Load more resumes
 const loadMore = () => {
@@ -112,6 +118,8 @@ watchEffect(() => {
 .list-container {
   margin: 24px 0;
   padding: 0 16px;
+  border-radius: 8px;
+  padding: 16px 14px;
 }
 
 .resume-des {
@@ -132,6 +140,10 @@ watchEffect(() => {
 .title-container {
   text-align: center;
   margin-top: 12px;
+}
+.title-container p {
+  padding: 0;
+  margin: 0;
 }
 
 .see-more-container {
@@ -163,6 +175,18 @@ watchEffect(() => {
 .ant-col {
   padding-left: 8px !important;
   padding-right: 8px !important;
+}
+
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-data-message img {
+  width: 100%;
+  max-width: 500px;
 }
 
 @media (max-width: 600px) {

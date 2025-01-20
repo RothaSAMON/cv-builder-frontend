@@ -44,16 +44,16 @@
           <div v-for="section in cvData.sections" :key="section._id">
             <DashboardPersonalDetailsForm
               v-if="section.type === 'PersonalDetail'"
-              :firstName="section.content?.firstName"
-              :lastName="section.content?.lastName"
-              :personalPosition="section.content?.position"
-              :personalSummary="section.content?.summary"
-              :imageUrl="section.content?.imageUrl"
+              :firstName="section.content?.firstName || ''"
+              :lastName="section.content?.lastName || ''"
+              :personalPosition="section.content?.position || ''"
+              :personalSummary="section.content?.summary || ''"
+              :imageUrl="section.content?.imageUrl || ''"
             />
 
             <DashboardSkillsForm
               v-if="section.type === 'Skills'"
-              :skills="section.content"
+              :skills="section.content || ''"
             />
 
             <DashboardLanguagueForm
@@ -95,7 +95,7 @@
           </div>
 
           <!-- Submit Button -->
-          <div class="submit-container">
+          <!-- <div class="submit-container">
             <a-button
               type="primary"
               @click="handleSubmit"
@@ -103,7 +103,7 @@
             >
               Submit
             </a-button>
-          </div>
+          </div> -->
         </div>
 
         <!-- Right Section -->
