@@ -1,5 +1,10 @@
 <template>
   <div class="login-form">
+    <CustomAlert
+      v-if="alertStore.isVisible"
+      :type="alertStore.type"
+      :message="alertStore.message"
+    />
     <section>
       <NuxtLink to="/">
         <NuxtImg
@@ -50,6 +55,7 @@
 import { useForm } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
 import { useAlertStore } from "~/store/alertStore";
+import { message } from "ant-design-vue";
 
 // Initialize Vee Validate with the schema
 const { handleSubmit } = useForm({
@@ -62,7 +68,6 @@ const alertStore = useAlertStore();
 
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
-  // Add login logic (e.g., API call)
   try {
     const result = await loginMutation.mutateAsync({
       email: values.email,

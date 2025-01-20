@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useAuthStore } from "~/store/auth";
 import type { User } from "~/types/auth";
 import type { JsonResponseType } from "~/types/json";
@@ -6,6 +6,7 @@ import type { JsonResponseType } from "~/types/json";
 export const useUser = () => {
   const { $api } = useNuxtApp();
   const authStore = useAuthStore();
+  const queryClient = useQueryClient();
 
   const userQuery = useQuery({
     queryKey: ["user"],
@@ -52,6 +53,7 @@ export const useUser = () => {
 
   // Update User Data
   const updateUser = useMutation({
+    mutationKey: ["user"],
     mutationFn: async (updatedData: User) => {
       const response = await $api.put<JsonResponseType<User>>(
         "/profile",
@@ -60,14 +62,16 @@ export const useUser = () => {
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate and refetch the user data after a successful update
-      // queryClient.invalidateQueries(["user"]);
-      console.log("Successfully updated user data!");
+      queryClient.invalidateQueries({
+        queryKey: ["user"] as const,
+        exact: true,
+      });
     },
   });
 
   // Patch Profile Image
   const updateProfileImage = useMutation({
+    mutationKey: ["user"],
     mutationFn: async (imageData: FormData) => {
       const response = await $api.patch<JsonResponseType<User>>(
         "/profile/image",
@@ -76,24 +80,28 @@ export const useUser = () => {
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate and refetch the user data after a successful patch
-      // queryClient.invalidateQueries(["user"]);
-      console.log("Successfully updated profile image!");
+      queryClient.invalidateQueries({
+        queryKey: ["user"] as const,
+        exact: true,
+      });
     },
   });
 
   // Delete Profile Image
   const deleteProfileImage = useMutation({
+    mutationKey: ["user"],
     mutationFn: async () => {
       const response = await $api.delete<JsonResponseType<User>>(
         "/profile/image"
       );
       return response.data;
     },
+
     onSuccess: () => {
-      // Invalidate and refetch the user data after a successful delete
-      // queryClient.invalidateQueries(["user"]);
-      console.log("Successfully deleted profile image!");
+      queryClient.invalidateQueries({
+        queryKey: ["user"] as const,
+        exact: true,
+      });
     },
   });
 
@@ -101,6 +109,6 @@ export const useUser = () => {
     userQuery,
     updateUser,
     updateProfileImage,
-    deleteProfileImage
+    deleteProfileImage,
   };
 };

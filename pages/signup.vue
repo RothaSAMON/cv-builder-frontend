@@ -1,5 +1,11 @@
 <template>
   <div class="login-form">
+    <CustomAlert
+      v-if="alertStore.isVisible"
+      :type="alertStore.type"
+      :message="alertStore.message"
+    />
+
     <section>
       <NuxtLink to="/">
         <NuxtImg
@@ -87,8 +93,11 @@ import { useForm, useField } from "vee-validate";
 import { toFieldValidator } from "@vee-validate/zod";
 import InputForm from "@/components/InputForm.vue";
 import DatePickerForm from "@/components/DatePickerForm.vue";
+import { useAlertStore } from "~/store/alertStore";
 
 const { signupMutation } = useAuth();
+const alertStore = useAlertStore();
+
 // Initialize the form
 const { handleSubmit, errors } = useForm({
   validationSchema: toFieldValidator(signUpSchema),
@@ -110,10 +119,19 @@ const onSubmit = handleSubmit(async (formValues) => {
       confirmPassword: formValues.confirmPassword,
     });
     if (result) {
+      alertStore.showAlert({
+        message: result.message,
+        type: "success",
+        duration: 5000,
+      });
       navigateTo("dashboard");
     }
-  } catch (error) {
-    console.log(error);
+  } catch (error : any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
   }
 });
 

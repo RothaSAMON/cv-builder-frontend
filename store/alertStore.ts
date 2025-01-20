@@ -29,6 +29,7 @@ export const useAlertStore = defineStore("alert", () => {
     const clearAlert = () => {
         isVisible.value = false;
         message.value = null;
+        type.value = "info";
     };
 
     return {

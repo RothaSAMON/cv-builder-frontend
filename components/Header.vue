@@ -12,7 +12,9 @@
         :src="userData?.imageProfile || defaultAvatar"
       />
       <div class="user-details">
-        <h3 class="user-name">{{ userData?.firstName || "User" }} {{ userData?.lastName }}</h3>
+        <h3 class="user-name">
+          {{ userData?.firstName || "User" }} {{ userData?.lastName }}
+        </h3>
         <p class="user-role">{{ userData?.email || "example@gmail.com" }}</p>
       </div>
       <span class="dropdown-icon" :class="{ rotated: isDropdownOpen }">▼</span>
@@ -48,7 +50,8 @@ const { userQuery } = useUser();
 const userData = computed(() => userQuery.data.value?.data);
 
 // Default avatar image
-const defaultAvatar = "https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5MC00NTk4LTk2OTYtNDU3NTJiM2QxNzM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg";
+const defaultAvatar =
+  "https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.webp";
 </script>
 
 <style scoped>
