@@ -31,5 +31,27 @@ export const useSection = <T>() => {
     },
   });
 
-  return { updateSection };
+  // Patch Section Image by CV ID
+  const updateSectionImage = useMutation({
+    mutationFn: async ({
+      cvId,
+      imageData,
+    }: {
+      cvId: string;
+      imageData: FormData;
+    }) => {
+      const response = await $api.patch<JsonResponseType<T>>(
+        `${baseURL}/sections/${cvId}/image`,
+        imageData
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the section data after a successful patch
+      // queryClient.invalidateQueries(["section", cvId]);
+      console.log("Successfully updated section image!");
+    },
+  });
+
+  return { updateSection, updateSectionImage };
 };

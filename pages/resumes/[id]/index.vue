@@ -48,6 +48,7 @@
               :lastName="section.content?.lastName"
               :personalPosition="section.content?.position"
               :personalSummary="section.content?.summary"
+              :imageUrl="section.content?.imageUrl"
             />
 
             <DashboardSkillsForm

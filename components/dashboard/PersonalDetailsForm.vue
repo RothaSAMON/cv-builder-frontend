@@ -15,18 +15,20 @@
           :before-upload="beforeUpload"
           @change="handleChange"
         >
-          <div>
-            <img
-              v-if="imageUrl"
-              :src="imageUrl"
-              alt="avatar"
-              style="width: 100%"
-            />
-            <div v-else>
-              <a-icon type="plus" />
-              <div style="margin-top: 8px">Upload</div>
+          <a-spin :spinning="imageUploading">
+            <div>
+              <img
+                v-if="imageUrl"
+                :src="imageUrl"
+                alt="avatar"
+                style="width: 100%"
+              />
+              <div v-else>
+                <a-icon type="plus" />
+                <div style="margin-top: 8px">Upload</div>
+              </div>
             </div>
-          </div>
+          </a-spin>
         </a-upload>
       </a-form-item>
 
@@ -74,12 +76,16 @@ import InputForm from "~/components/InputForm.vue";
 import TextAreaForm from "~/components/TextAreaForm.vue";
 import { useSection } from "~/composables/useSection";
 
+const route = useRoute();
+const cvId = route.params.id as string;
+
 // Props Definition
 interface DashboardPersonalDetailsFormProps {
   firstName?: string;
   lastName?: string;
   personalPosition?: string;
   personalSummary?: string;
+  imageUrl?: string;
 }
 const props = defineProps<DashboardPersonalDetailsFormProps>();
 
@@ -97,7 +103,9 @@ const { handleSubmit, values, errors } = useForm({
 });
 
 // Image Upload Logic
-const imageUrl = ref<string | null>(null);
+const { updateSectionImage } = useSection<any>();
+const imageUrl = ref<string | null>(props.imageUrl || null);
+const imageUploading = ref(false);
 
 const beforeUpload = (file: File) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -109,12 +117,32 @@ const beforeUpload = (file: File) => {
   return isJpgOrPng && isLt2M;
 };
 
-const handleChange = (info: any) => {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    imageUrl.value = e.target?.result as string;
-  };
-  reader.readAsDataURL(info.file.originFileObj);
+const handleChange = async (info: any) => {
+  const file = info.file.originFileObj;
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageUrl.value = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    imageUploading.value = true;
+
+    try {
+      await updateSectionImage.mutateAsync({
+        cvId: cvId,
+        imageData: formData,
+      });
+      console.log("Profile image updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile image:", error);
+    } finally {
+      imageUploading.value = false;
+    }
+  }
 };
 
 // Initialize Patch Function
@@ -129,28 +157,25 @@ type UpdatePersonalContent = {
   imageUrl?: string;
 };
 
-const route = useRoute();
-const cvId = route.params.id as string;
-
 // Form Submission
 const onSubmit = handleSubmit(async (values) => {
   // Create the updated section data in the required format
   const requestBody = {
-    type: "PersonalDetail", // Fixed type
+    type: "PersonalDetail",
     content: {
       firstName: values.firstName,
       lastName: values.lastName,
       position: values.personalPosition,
       summary: values.personalSummary,
-      imageUrl: imageUrl.value || "", // Use the uploaded image URL or default to an empty string
+      imageUrl: imageUrl.value || "",
     },
   };
 
   try {
     // Send the correctly formatted data to the backend
     const response = await updateSection.mutateAsync({
-      cvId: cvId, // Example CV ID
-      updateContent: requestBody, // Send the entire requestBody as required
+      cvId: cvId,
+      updateContent: requestBody,
     });
 
     console.log("Successfully updated section:", response);
@@ -162,6 +187,13 @@ const onSubmit = handleSubmit(async (values) => {
   console.log("Submitted Payload:", requestBody);
 });
 
+onMounted(() => {
+  // Fetch the existing image URL if available
+  if (props.imageUrl) {
+    imageUrl.value = props.imageUrl;
+  }
+});
+console.log("Image url", props.imageUrl);
 </script>
 
 <style scoped>
