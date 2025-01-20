@@ -11,7 +11,7 @@ export interface UpdatePersonalContent {
 
 // Type for Contact Content
 export interface UpdateContactContent {
-  phone?: string;
+  phoneNumber?: string;
   email?: string;
   address?: string;
 }
@@ -34,7 +34,7 @@ export interface UpdateExperienceContent {
 
 // Type for Education Content
 export interface UpdateEducationContent {
-  school?: string;
+  schoolName?: string;
   degreeMajor?: string;
   startDate?: Date;
   endDate?: Date;

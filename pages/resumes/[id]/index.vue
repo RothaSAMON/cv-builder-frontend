@@ -109,7 +109,7 @@
         <div class="right-section">
           <DashboardResume
             :selectedTemplate="selectedTemplate"
-            :cvData="cvData"
+            :cvData="cvData.sections"
           />
         </div>
       </div>
@@ -120,15 +120,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
-// import DashboardPageHeader from "@/components/DashboardPageHeader.vue";
-// import DashboardPersonalDetailsForm from "@/components/dashboard/PersonalDetailsForm.vue";
-// import DashboardSkillsForm from "@/components/dashboard/SkillsForm.vue";
-// import DashboardLanguagueForm from "@/components/dashboard/LanguagueForm.vue";
-// import DashboardContactMeForm from "@/components/dashboard/ContactMeForm.vue";
-// import DashboardExperienceForm from "@/components/dashboard/ExperienceForm.vue";
-// import DashboardEducationForm from "@/components/dashboard/EducationForm.vue";
-// import DashboardReferenceForm from "@/components/dashboard/ReferenceForm.vue";
-// import DashboardResume from "@/components/dashboard/Resume.vue";
 
 const routes = [
   { path: "/resumes", breadcrumbName: "Resumes" },

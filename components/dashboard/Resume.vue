@@ -1,19 +1,25 @@
 <template>
+  <section class="export-button">
+    <a-button @click="exportAsPDF">Export as PDF</a-button>
+  </section>
   <div class="right-section">
-    <div
+    <section
+      ref="resumeSection"
       class="resume-template"
       :style="{ backgroundImage: 'url(' + selectedTemplate + ')' }"
     >
       <!-- Profile Image -->
       <NuxtImg
         class="profile-image"
-        :style="{ backgroundImage: 'url(' + dummyData.profileImage + ')' }"
+        :style="{ backgroundImage: 'url(' + personalSection?.imageUrl + ')' }"
       />
 
       <!-- Dummy data overlay on resume -->
       <section class="personal-detail">
-        <h2 class="name-section">{{ dummyData.name }}</h2>
-        <h3 class="title-section">{{ dummyData.jobTitle }}</h3>
+        <h2 class="name-section">
+          {{ personalSection?.firstName }} {{ personalSection?.lastName }}
+        </h2>
+        <h3 class="title-section">{{ personalSection?.position }}</h3>
       </section>
 
       <div class="content-container">
@@ -21,16 +27,16 @@
         <section class="left-container">
           <section class="contact-section">
             <h3 class="section-title">Contact Me</h3>
-            <p>{{ dummyData.phoneNumber }}</p>
-            <p>{{ dummyData.email }}</p>
-            <p>{{ dummyData.address }}</p>
+            <p>{{ contactSection?.phoneNumber }}</p>
+            <p>{{ contactSection.email }}</p>
+            <p>{{ contactSection.address }}</p>
             <hr />
           </section>
 
           <section class="skills-section">
             <h3 class="section-title">Skills</h3>
             <ul>
-              <li v-for="(skill, index) in dummyData.skills" :key="index">
+              <li v-for="(skill, index) in skillsSection" :key="index">
                 <span class="skill-name">{{ skill.name }}</span> :
                 <span class="skill-level">{{ skill.level }}</span>
               </li>
@@ -41,8 +47,8 @@
           <section class="languages-section">
             <h3 class="section-title">Language</h3>
             <ul>
-              <li v-for="(language, index) in dummyData.languages" :key="index">
-                <span class="language-name">{{ language.name }}</span> :
+              <li v-for="(language, index) in languageSection" :key="index">
+                <span class="language-name">{{ language.language }}</span> :
                 <span class="language-level">{{ language.level }}</span>
               </li>
             </ul>
@@ -53,7 +59,7 @@
             <h3 class="section-title">Reference</h3>
 
             <div
-              v-for="(reference, index) in dummyData.references"
+              v-for="(reference, index) in referenceSection"
               :key="index"
             >
               <p>{{ reference.firstName }} {{ reference.lastName }}</p>
@@ -70,15 +76,15 @@
         <section class="right-container">
           <section class="summary-section">
             <h3 class="section-title">About</h3>
-            <p>{{ dummyData.about }}</p>
-            <hr>
+            <p>{{ personalSection?.summary }}</p>
+            <hr />
           </section>
 
           <section class="experiences-section">
             <h3 class="section-title">Experience</h3>
 
             <div
-              v-for="(experience, index) in dummyData.experiences"
+              v-for="(experience, index) in experienceSection"
               :key="index"
             >
               <p>{{ experience.jobTitle }}</p>
@@ -93,7 +99,7 @@
             <h3 class="section-title">Education</h3>
 
             <div
-              v-for="(education, index) in dummyData.educations"
+              v-for="(education, index) in educationSection"
               :key="index"
             >
               <p>{{ education.schoolName }}</p>
@@ -104,20 +110,78 @@
           </section>
         </section>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
-<script setup>
-import { defineProps, reactive } from "vue";
+<script setup lang="ts">
+import { defineProps, reactive, ref } from "vue";
+import type {
+  SectionKeys,
+  UpdateContactContent,
+  UpdateEducationContent,
+  UpdateExperienceContent,
+  UpdateLanguageContent,
+  UpdatePersonalContent,
+  UpdateReferenceContent,
+  UpdateSectionSchemasTypes,
+  UpdateSkillContent,
+} from "~/types/section";
+import type { UpdateSection } from "~/types/section";
+// import { html2pdf } from "html2pdf.js";
 
 // Accept `selectedTemplate` as a prop
-defineProps({
-  selectedTemplate: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  selectedTemplate: string;
+  cvData: UpdateSection[] | undefined;
+}>();
+
+// Type guard for narrowing
+function isSectionType<T extends keyof UpdateSectionSchemasTypes>(
+  section: UpdateSection,
+  type: T
+): section is UpdateSection & {
+  type: T;
+  content: UpdateSectionSchemasTypes[T];
+} {
+  // Mapping types to match
+  const typeMapping: Record<string, string> = {
+    personal: "PersonalDetail",
+    contact: "Contact",
+    skills: "Skills",
+    experiences: "Experiences",
+    educations: "Education",
+    languages: "Languages",
+    references: "Reference",
+  };
+
+  // Ensure that the 'type' input gets
+  const mappedType = typeMapping[type as keyof typeof typeMapping];
+
+  // Check if the section type matches the mapped type
+  return section.type === mappedType;
+}
+
+const sectionsMap = new Map(
+  (props.cvData || []).map((section) => [section.type, section])
+);
+
+// Declare the data each types
+const personalSection = sectionsMap.get("PersonalDetail")
+  ?.content as UpdatePersonalContent;
+const contactSection = sectionsMap.get("Contact")
+  ?.content as UpdateContactContent;
+const skillsSection = sectionsMap.get("Skills")?.content as UpdateSkillContent[];
+const experienceSection = sectionsMap.get("Experiences")
+  ?.content as UpdateExperienceContent[];
+const educationSection = sectionsMap.get("Education")
+  ?.content as UpdateEducationContent[];
+const languageSection = sectionsMap.get("Languages")
+  ?.content as UpdateLanguageContent[];
+const referenceSection = sectionsMap.get("Reference")
+  ?.content as UpdateReferenceContent[];
+
+console.log("Test content", skillsSection);
 
 // Dummy data for the resume
 const dummyData = reactive({
@@ -227,7 +291,31 @@ const dummyData = reactive({
     "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
 });
 
+// Reference to the resume section
+const resumeSection = ref(null);
 
+const exportAsPDF = async () => {
+  const options = {
+    filename: `${dummyData.name.replace(/ /g, "_")}_Resume.pdf`,
+    html2canvas: { scale: 1 },
+    jsPDF: {
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+      autoSize: true,
+      compress: true,
+    },
+  };
+
+  const element = resumeSection.value;
+
+  if (element) {
+    // Ignore TypeScript error for the import
+    // @ts-ignore
+    const html2pdf = (await import("html2pdf.js")).default;
+    html2pdf().set(options).from(element).save();
+  }
+};
 </script>
 
 <style scoped>
@@ -241,6 +329,12 @@ const dummyData = reactive({
   top: 20px;
   height: 100vh;
   overflow-y: auto;
+}
+
+.export-button {
+  display: flex;
+  justify-content: end;
+  margin-bottom: 16px;
 }
 
 .resume-template {
@@ -292,11 +386,12 @@ const dummyData = reactive({
 }
 
 .left-container {
-  width: 460px;
+  width: 260px;
 }
 
 .right-container {
   margin-left: 24px;
+  width: 650px;
 }
 
 .educations-section p,
