@@ -1,10 +1,12 @@
 <template>
   <div class="container">
-    <DashboardPageHeader
-      title="Resumes"
-      subTitle="Create your resumes to find a job"
-      :breadcrumbRoutes="routes"
-    />
+    <div class="page-header">
+      <DashboardPageHeader
+        title="Resumes"
+        subTitle="Create your resumes to find a job"
+        :breadcrumbRoutes="routes"
+      />
+    </div>
 
     <DashboardResumeList />
   </div>
@@ -28,5 +30,11 @@ const routes = [
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .page-header {
+    display: none;
+  }
 }
 </style>

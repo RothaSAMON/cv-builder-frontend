@@ -51,11 +51,15 @@ import {
   LogoutOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons-vue";
+import { useAuth } from "~/composables/useAuth"; // Ensure the path is correct for useAuth
+import { useAlertStore } from "~/store/alertStore";
 
 const { logoutMutation } = useAuth();
 
 const isModalVisible = ref(false);
 const warningIcon = ExclamationCircleOutlined;
+
+const alertStore = useAlertStore();
 
 const showLogoutModal = () => {
   isModalVisible.value = true;
@@ -66,20 +70,30 @@ const handleLogout = async () => {
     const data = await logoutMutation.mutateAsync();
 
     if (data) {
+      // Reset the modal visibility
+      isModalVisible.value = false;
+
       // alertStore.showAlert({
       //   message: data.message,
       //   type: "success",
       //   duration: 5000,
       // });
+      // Navigate to login page after successful logout
       navigateTo("/login");
     }
   } catch (error: any) {
-    // authStore.setMessage(error.data.message);
-    console.error("Error logging in", error);
+    console.error("Error logging out", error);
+    // Optionally show an alert with the error message
+    alertStore.showAlert({
+      message: "Logout failed. Please try again.",
+      type: "error",
+      duration: 5000,
+    });
   }
 };
 
 const handleCancel = () => {
+  // Close the modal if the user cancels the logout
   isModalVisible.value = false;
 };
 </script>
@@ -104,7 +118,7 @@ const handleCancel = () => {
 
 /* Change the background color of the arrow icon */
 :deep(.ant-layout-sider-trigger) {
-  background-color: #2977FF;
+  background-color: #2977ff;
   color: white;
 }
 </style>

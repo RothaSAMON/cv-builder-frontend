@@ -73,6 +73,7 @@ export const useCV = () => {
       const response = await $api.post(`${baseURL}/cvs`, formData);
       return response.data;
     },
+    
     onSuccess: () => {
       console.log("Successfully created CV!");
       // queryClient.invalidateQueries(["cv"]); // Refetch the list of CVs
@@ -82,5 +83,28 @@ export const useCV = () => {
     },
   });
 
-  return { cvQueryAll, fetchCVsByUserId, fetchCVById, updateCV, createCV };
+  // Delete CV mutation
+  const deleteCV = useMutation({
+    mutationFn: async (cvId: string) => {
+      const response = await $api.delete(`/cvs/${cvId}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      // Optionally invalidate queries to refresh related data
+      // queryClient.invalidateQueries(["cv"]);
+      console.log("Successfully deleted CV!");
+    },
+    onError: (error) => {
+      console.error("Error deleting CV", error);
+    },
+  });
+
+  return {
+    cvQueryAll,
+    fetchCVsByUserId,
+    fetchCVById,
+    updateCV,
+    createCV,
+    deleteCV,
+  };
 };

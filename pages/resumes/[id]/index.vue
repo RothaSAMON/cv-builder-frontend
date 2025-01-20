@@ -44,15 +44,15 @@
           <div v-for="section in cvData.sections" :key="section._id">
             <DashboardPersonalDetailsForm
               v-if="section.type === 'PersonalDetail'"
-              :firstName="section.content?.firstName || ''"
-              :lastName="section.content?.lastName || ''"
-              :personalPosition="section.content?.position || ''"
-              :personalSummary="section.content?.summary || ''"
+              :firstName="section.content?.firstName"
+              :lastName="section.content?.lastName"
+              :personalPosition="section.content?.position"
+              :personalSummary="section.content?.summary"
             />
 
             <DashboardSkillsForm
               v-if="section.type === 'Skills'"
-              :skills="section.content || ''"
+              :skills="section.content"
             />
 
             <DashboardLanguagueForm
