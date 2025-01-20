@@ -58,10 +58,7 @@
           <section class="reference-section">
             <h3 class="section-title">Reference</h3>
 
-            <div
-              v-for="(reference, index) in referenceSection"
-              :key="index"
-            >
+            <div v-for="(reference, index) in referenceSection" :key="index">
               <p>{{ reference.firstName }} {{ reference.lastName }}</p>
               <p>{{ reference.company }}</p>
               <p>{{ reference.position }}</p>
@@ -83,13 +80,13 @@
           <section class="experiences-section">
             <h3 class="section-title">Experience</h3>
 
-            <div
-              v-for="(experience, index) in experienceSection"
-              :key="index"
-            >
+            <div v-for="(experience, index) in experienceSection" :key="index">
               <p>{{ experience.jobTitle }}</p>
               <p>{{ experience.position }}</p>
-              <p>{{ experience.startDate }} - {{ experience.endDate }}</p>
+              <p class="sub-title">{{ experience.description }}</p>
+              <p class="sub-title">
+                {{ experience.startDate }} - {{ experience.endDate }}
+              </p>
               <br />
             </div>
             <hr />
@@ -98,13 +95,10 @@
           <section class="educations-section">
             <h3 class="section-title">Education</h3>
 
-            <div
-              v-for="(education, index) in educationSection"
-              :key="index"
-            >
-              <p>{{ education.schoolName }}</p>
+            <div v-for="(education, index) in educationSection" :key="index">
               <p>{{ education.degreeMajor }}</p>
-              <p>{{ education.startDate }} - {{ education.endDate }}</p>
+              <p class="sub-title">{{ education.schoolName }}</p>
+              <p class="sub-title">{{ education.startDate }} - {{ education.endDate }}</p>
               <br />
             </div>
           </section>
@@ -171,7 +165,8 @@ const personalSection = sectionsMap.get("PersonalDetail")
   ?.content as UpdatePersonalContent;
 const contactSection = sectionsMap.get("Contact")
   ?.content as UpdateContactContent;
-const skillsSection = sectionsMap.get("Skills")?.content as UpdateSkillContent[];
+const skillsSection = sectionsMap.get("Skills")
+  ?.content as UpdateSkillContent[];
 const experienceSection = sectionsMap.get("Experiences")
   ?.content as UpdateExperienceContent[];
 const educationSection = sectionsMap.get("Education")
@@ -183,120 +178,13 @@ const referenceSection = sectionsMap.get("Reference")
 
 console.log("Test content", skillsSection);
 
-// Dummy data for the resume
-const dummyData = reactive({
-  name: "John Doe",
-  jobTitle: "Software Engineer",
-
-  phoneNumber: "(123) 456-7890",
-  email: "samonrotha@gmail.com",
-  address: "Toul Sangkea, Russey Keo, Phnom Penh",
-
-  about:
-    "Experienced software engineer with a passion for developing innovative programs. Skilled in various programming languages, including Vue.js, JavaScript, and Node.js.",
-
-  education: "Bachelor's in Computer Science, XYZ University, 2018 - 2022",
-
-  experience:
-    "Software Developer at ABC Corp (2022 - Present)\nDeveloped web applications using Vue.js and Node.js. Led a team of 3 engineers in project management.",
-
-  skills: [
-    { name: "HTML", level: "Expert" },
-    { name: "CSS", level: "Advanced" },
-    { name: "JavaScript", level: "Expert" },
-    { name: "Vue.js", level: "Advanced" },
-    { name: "Node.js", level: "Intermediate" },
-    { name: "HTML", level: "Expert" },
-    { name: "CSS", level: "Advanced" },
-    { name: "JavaScript", level: "Expert" },
-    { name: "Vue.js", level: "Advanced" },
-    { name: "Node.js", level: "Intermediate" },
-  ],
-
-  languages: [
-    { name: "Khmer", level: "Native" },
-    { name: "English", level: "Advanced" },
-    { name: "Japanese", level: "Advanced" },
-    { name: "Spanish", level: "Advanced" },
-  ],
-
-  references: [
-    {
-      firstName: "Samon",
-      lastName: "Rotha",
-      position: "Codinator",
-      company: "Co Ltd",
-      email: "example@gmail.com",
-      phoneNumber: "+855 72 983 293",
-    },
-    {
-      firstName: "Samon",
-      lastName: "Rotha",
-      position: "Codinator",
-      company: "Co Ltd",
-      email: "example@gmail.com",
-      phoneNumber: "+855 72 983 293",
-    },
-  ],
-
-  experiences: [
-    {
-      jobTitle: "IT Game - SEAGAME 32nd",
-      position: "IT Game Admin",
-      startDate: "23-11-2023",
-      endDate: "23-12-2023",
-    },
-    {
-      jobTitle: "IT Game - SEAGAME 32nd",
-      position: "IT Game Admin",
-      startDate: "23-11-2023",
-      endDate: "23-12-2023",
-    },
-    {
-      jobTitle: "IT Game - SEAGAME 32nd",
-      position: "IT Game Admin",
-      startDate: "23-11-2023",
-      endDate: "23-12-2023",
-    },
-    {
-      jobTitle: "IT Game - SEAGAME 32nd",
-      position: "IT Game Admin",
-      startDate: "23-11-2023",
-      endDate: "23-12-2023",
-    },
-  ],
-
-  educations: [
-    {
-      schoolName: "Russey Keo High School",
-      degreeMajor: "Bachelor Degree",
-      startDate: "23-11-2023",
-      endDate: "23-12-2023",
-    },
-    {
-      schoolName: "Russey Keo High School",
-      degreeMajor: "Bachelor Degree",
-      startDate: "23-11-2023",
-      endDate: "23-12-2023",
-    },
-    {
-      schoolName: "Russey Keo High School",
-      degreeMajor: "Bachelor Degree",
-      startDate: "23-11-2023",
-      endDate: "23-12-2023",
-    },
-  ],
-
-  profileImage:
-    "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
-});
-
 // Reference to the resume section
 const resumeSection = ref(null);
 
 const exportAsPDF = async () => {
+  const firstName = personalSection?.firstName ?? "Unknown";
   const options = {
-    filename: `${dummyData.name.replace(/ /g, "_")}_Resume.pdf`,
+    filename: `${firstName.replace(/ /g, "_")}_Resume.pdf`,
     html2canvas: { scale: 1 },
     jsPDF: {
       orientation: "portrait",
