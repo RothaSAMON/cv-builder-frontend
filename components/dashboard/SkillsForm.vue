@@ -53,6 +53,12 @@
       </a-button>
     </a-form>
   </div>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -62,6 +68,7 @@ import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
 import type { UpdateSkillContent } from "~/types/section";
 import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
 // Define the validation schema
 const SkillSchema = z.object({
@@ -102,6 +109,7 @@ if (props.skills) {
 
 // Initialize patch functionality
 const { updateSection } = useSection();
+const alertStore = useAlertStore();
 const route = useRoute();
 const cvId = route.params.id as string;
 
@@ -122,13 +130,20 @@ const onSubmit = handleSubmit(async (data) => {
       updateContent: requestBody,
     });
 
-    console.log("Successfully updated skills:", response);
-  } catch (error) {
-    console.error("Error updating skills:", error);
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
   }
-
-  // Log the submitted payload for debugging
-  console.log("Submitted Payload:", requestBody);
 });
 </script>
 

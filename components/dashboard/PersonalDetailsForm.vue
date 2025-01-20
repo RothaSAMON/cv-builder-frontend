@@ -65,6 +65,11 @@
       <a-button type="primary" html-type="submit">Submit</a-button>
     </a-form>
   </section>
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -75,6 +80,7 @@ import * as z from "zod";
 import InputForm from "~/components/InputForm.vue";
 import TextAreaForm from "~/components/TextAreaForm.vue";
 import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
 const route = useRoute();
 const cvId = route.params.id as string;
@@ -147,6 +153,7 @@ const handleChange = async (info: any) => {
 
 // Initialize Patch Function
 const { updateSection } = useSection();
+const alertStore = useAlertStore();
 
 // Define the UpdatePersonalContent type here
 type UpdatePersonalContent = {
@@ -178,13 +185,20 @@ const onSubmit = handleSubmit(async (values) => {
       updateContent: requestBody,
     });
 
-    console.log("Successfully updated section:", response);
-  } catch (error) {
-    console.error("Error updating personal details:", error);
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
   }
-
-  // Log the final payload for verification
-  console.log("Submitted Payload:", requestBody);
 });
 
 onMounted(() => {

@@ -98,6 +98,12 @@
       </a-button>
     </a-form>
   </div>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -108,6 +114,7 @@ import { DeleteOutlined } from "@ant-design/icons-vue";
 import TextAreaForm from "@/components/TextAreaForm.vue"; // TextAreaForm component
 import type { UpdateExperienceContent } from "~/types/section";
 import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
 // Props received from the parent
 const props = defineProps<{
@@ -156,6 +163,7 @@ const removeField = (index: number) => {
 
 // Patch functionality
 const { updateSection } = useSection();
+const alertStore = useAlertStore();
 const route = useRoute();
 const cvId = route.params.id as string;
 
@@ -179,12 +187,20 @@ const onSubmit = handleSubmit(async (data) => {
       updateContent: requestBody,
     });
 
-    console.log("Successfully updated experiences:", response);
-  } catch (error) {
-    console.error("Error updating experiences:", error);
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
   }
-
-  console.log("Submitted Payload:", requestBody);
 });
 </script>
 

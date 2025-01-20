@@ -35,6 +35,12 @@
       </a-form-item>
     </a-form>
   </section>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -44,6 +50,7 @@ import { toFieldValidator } from "@vee-validate/zod";
 import InputForm from "~/components/InputForm.vue";
 import TextAreaForm from "~/components/TextAreaForm.vue";
 import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
 // Define types for the contact props
 interface ContactProps {
@@ -76,9 +83,9 @@ const { handleSubmit, values } = useForm({
 
 // Initialize Patch Function
 const { updateSection } = useSection();
+const alertStore = useAlertStore();
 const route = useRoute();
 const cvId = route.params.id as string;
-console.log("Cv id", cvId)
 
 // Form Submission
 const onSubmit = handleSubmit(async (data) => {
@@ -95,17 +102,24 @@ const onSubmit = handleSubmit(async (data) => {
   try {
     // Send the correctly formatted payload to the backend
     const response = await updateSection.mutateAsync({
-      cvId: cvId, // Example CV ID (replace with the correct ID)
-      updateContent: requestBody, // Send the full `requestBody` object
+      cvId: cvId,
+      updateContent: requestBody,
     });
 
-    console.log("Successfully updated contact information:", response);
-  } catch (error) {
-    console.error("Error updating contact information:", error);
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
   }
-
-  // Log the formatted payload for debugging
-  console.log("Submitted Payload:", requestBody);
 });
 </script>
 

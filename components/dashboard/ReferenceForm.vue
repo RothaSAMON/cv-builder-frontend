@@ -56,6 +56,12 @@
       </a-form-item>
     </a-form>
   </section>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -66,6 +72,7 @@ import { toFieldValidator } from "@vee-validate/zod";
 import InputForm from "~/components/InputForm.vue";
 import { useSection } from "~/composables/useSection";
 import type { UpdateReferenceContent } from "~/types/section";
+import { useAlertStore } from "~/store/alertStore";
 
 // Define the prop type for references
 interface ReferenceProps {
@@ -74,7 +81,6 @@ interface ReferenceProps {
 
 const props = defineProps<ReferenceProps>();
 
-// Reactive form values initialized with the first reference (if exists)
 const formValues = reactive({
   refFirstName: props?.references[0]?.firstName || "",
   refLastName: props?.references[0]?.lastName || "",
@@ -97,11 +103,12 @@ const schema = z.object({
 // Initialize the form with Vee-Validate
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(schema),
-  initialValues: formValues, // Sync reactive values with the form
+  initialValues: formValues,
 });
 
 // Initialize the patch mutation
 const { updateSection } = useSection();
+const alertStore = useAlertStore();
 const route = useRoute();
 const cvId = route.params.id as string;
 
@@ -109,7 +116,7 @@ const cvId = route.params.id as string;
 const onSubmit = handleSubmit(async (data) => {
   // Format the payload with type and content
   const requestBody = {
-    type: "Reference", // Fixed type
+    type: "Reference",
     content: {
       firstName: data.refFirstName,
       lastName: data.refLastName,
@@ -123,17 +130,24 @@ const onSubmit = handleSubmit(async (data) => {
   try {
     // Send the formatted payload to the backend
     const response = await updateSection.mutateAsync({
-      cvId: cvId, // Example CV ID (replace as needed)
-      updateContent: requestBody, // Send the formatted content
+      cvId: cvId,
+      updateContent: requestBody,
     });
 
-    console.log("Successfully updated reference information:", response);
-  } catch (error) {
-    console.error("Error updating reference information:", error);
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
   }
-
-  // Log the submitted payload for debugging
-  console.log("Submitted Payload:", requestBody);
 });
 </script>
 
