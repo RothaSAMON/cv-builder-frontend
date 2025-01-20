@@ -20,10 +20,13 @@
         :xs="24"
         :sm="12"
         :lg="8"
-        @click="goToResume(resume._id)"
       >
         <a-card class="card" :hoverable="true">
-          <a-row align="middle" justify="center">
+          <a-row
+            align="middle"
+            justify="center"
+            @click="goToResume(resume._id)"
+          >
             <!-- Resume Preview Image -->
             <a-col :span="24" class="image-container">
               <NuxtImg
@@ -42,6 +45,15 @@
               <h3>{{ resume.title }}</h3>
             </a-col>
           </a-row>
+          <div class="button-container">
+            <a-button
+              class="delete-button"
+              type="danger"
+              @click="confirmDelete(resume._id)"
+            >
+              Delete
+            </a-button>
+          </div>
         </a-card>
       </a-col>
     </a-row>
@@ -62,6 +74,7 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useCV } from "../../composables/useCv";
+import { Modal } from "ant-design-vue";
 
 // Props
 defineProps({
@@ -71,7 +84,7 @@ defineProps({
   },
 });
 
-const { cvQueryAll } = useCV();
+const { cvQueryAll, deleteCV } = useCV();
 const router = useRouter();
 
 // Fetch data from API
@@ -101,6 +114,31 @@ const loadMore = () => {
 // Navigate to specific resume detail page
 const goToResume = (resumeId: string) => {
   router.push(`/resumes/${resumeId}`);
+};
+
+// Confirm delete action
+const confirmDelete = (cvId: string) => {
+  Modal.confirm({
+    title: "Are you sure you want to delete this resume?",
+    content: "This action cannot be undone.",
+    okText: "Yes",
+    okType: "danger",
+    cancelText: "No",
+    onOk: () => deleteResume(cvId),
+  });
+};
+
+const deleteResume = async (cvId: string) => {
+  try {
+    // Call mutateAsync on the deleteCV mutation object
+    await deleteCV.mutateAsync(cvId);
+    console.log("Resume deleted successfully!");
+
+    // Refetch or update the resumes list
+    cvQueryAll.refetch(); // Ensures data stays in sync with the server
+  } catch (error) {
+    console.error("Error deleting resume:", error);
+  }
 };
 
 // Error handling for API fetch
@@ -187,6 +225,17 @@ watchEffect(() => {
 .no-data-message img {
   width: 100%;
   max-width: 500px;
+}
+
+.delete-button {
+  background-color: var(--error-color-100);
+  color: var(--error-color);
+  border: 1px solid var(--error-color-200);
+}
+.button-container {
+  display: flex;
+  justify-content: end;
+  align-items: end;
 }
 
 @media (max-width: 600px) {

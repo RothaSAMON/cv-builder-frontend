@@ -11,6 +11,7 @@ export const useSection = <T>() => {
 
   // Patch Section by CV ID
   const updateSection = useMutation({
+    mutationKey: ["section"],
     mutationFn: async ({
       cvId,
       updateContent,
@@ -24,15 +25,23 @@ export const useSection = <T>() => {
       );
       return response.data;
     },
-    onSuccess: () => {
-      // Invalidate and refetch the section data after a successful patch
-      // queryClient.invalidateQueries(["section", cvId]);
-      console.log("Successfully updated section!");
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["section"] as const,
+    //     exact: true,
+    //   });
+    // },
+    onSuccess: async() => {
+      await new Promise((resolve) => setTimeout(resolve, 200)); 
+      // Invalidate both `section` and `cv` queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["section"] });
+      queryClient.invalidateQueries({ queryKey: ["cv"] });
     },
   });
 
   // Patch Section Image by CV ID
   const updateSectionImage = useMutation({
+    mutationKey: ["section"],
     mutationFn: async ({
       cvId,
       imageData,
@@ -46,10 +55,16 @@ export const useSection = <T>() => {
       );
       return response.data;
     },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["section"] as const,
+    //     exact: true,
+    //   });
+    // },
     onSuccess: () => {
-      // Invalidate and refetch the section data after a successful patch
-      // queryClient.invalidateQueries(["section", cvId]);
-      console.log("Successfully updated section image!");
+      // Invalidate both `section` and `cv` queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["section"] });
+      queryClient.invalidateQueries({ queryKey: ["cv"] });
     },
   });
 

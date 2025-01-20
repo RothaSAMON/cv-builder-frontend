@@ -16,7 +16,7 @@ export const useUser = () => {
       return response.data;
     },
     refetchOnWindowFocus: false,
-    retry: 1, // Retry once on failure
+    retry: 1,
   });
 
   // Computed properties for easier access

@@ -12,7 +12,10 @@
         <!-- Profile Image -->
         <NuxtImg
           class="profile-image"
-          :style="{ backgroundImage: 'url(' + personalSection?.imageUrl + ')' }"
+          :style="{
+            backgroundImage:
+              'url(' + personalSection?.imageUrl + ')',
+          }"
         />
 
         <!-- Dummy data overlay on resume -->
@@ -113,9 +116,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, reactive, ref } from "vue";
+import { defineProps, ref } from "vue";
 import type {
-  SectionKeys,
   UpdateContactContent,
   UpdateEducationContent,
   UpdateExperienceContent,
@@ -126,7 +128,6 @@ import type {
   UpdateSkillContent,
 } from "~/types/section";
 import type { UpdateSection } from "~/types/section";
-// import { html2pdf } from "html2pdf.js";
 
 // Accept `selectedTemplate` as a prop
 const props = defineProps<{
@@ -179,8 +180,6 @@ const languageSection = sectionsMap.get("Languages")
   ?.content as UpdateLanguageContent[];
 const referenceSection = sectionsMap.get("Reference")
   ?.content as UpdateReferenceContent[];
-
-console.log("Test content", skillsSection);
 
 // Reference to the resume section
 const resumeSection = ref(null);

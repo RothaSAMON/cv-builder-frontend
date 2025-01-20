@@ -17,13 +17,14 @@ export const useCV = () => {
 
   const cvQueryAll = useQuery({
     queryKey: ["cv"],
-
     queryFn: async () => {
-      const response = await $api.get<JsonResponseType<CVType[]>>(`${baseURL}/cvs`);
+      const response = await $api.get<JsonResponseType<CVType[]>>(
+        `${baseURL}/cvs`
+      );
       return response.data;
     },
-    retry: false, // Disable automatic retries on failure
-    refetchOnWindowFocus: false, // Prevent refetch when the window gains focus
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   // Fetch CVs by specific user ID
@@ -38,7 +39,7 @@ export const useCV = () => {
         return response.data;
       },
 
-      enabled: !!userId, // Only fetch if userId is provided
+      enabled: !!userId,
     });
 
   const fetchCVById = (cvId: string) =>
@@ -48,11 +49,12 @@ export const useCV = () => {
         const response = await $api.get<CVType>(`${baseURL}/cvs/${cvId}`);
         return response.data;
       },
-      enabled: !!cvId, // Only fetch if cvId is provided
+      enabled: !!cvId,
     });
 
   const updateCV = (cvId: string, updatedData: Partial<CVType>) =>
     useMutation({
+      mutationKey: ["cv"],
       mutationFn: async () => {
         const response = await $api.patch<CVType>(
           `${baseURL}/cvs/${cvId}`,
@@ -60,10 +62,16 @@ export const useCV = () => {
         );
         return response.data;
       },
+      // onSuccess: () => {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["cv"] as const,
+      //     exact: true,
+      //   });
+      // },
       onSuccess: () => {
-        // Invalidate and refetch the CV data after a successful patch
-        // queryClient.invalidateQueries(["CV", cvId])
-        console.log("Succesfully Updated Data!!");
+        // Invalidate both `cv` and `section` queries to refresh data
+        queryClient.invalidateQueries({ queryKey: ["cv"] });
+        queryClient.invalidateQueries({ queryKey: ["section"] });
       },
       onError: (error) => {
         console.error("Error updating CV", error);
@@ -71,14 +79,22 @@ export const useCV = () => {
     });
 
   const createCV = useMutation({
+    mutationKey: ["cv"],
     mutationFn: async (formData: { title: string; templateUrl: string }) => {
       const response = await $api.post(`${baseURL}/cvs`, formData);
       return response.data;
     },
-    
+
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["cv"] as const,
+    //     exact: true,
+    //   });
+    // },
     onSuccess: () => {
-      console.log("Successfully created CV!");
-      // queryClient.invalidateQueries(["cv"]); // Refetch the list of CVs
+      // Invalidate both `cv` and `section` queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["cv"] });
+      queryClient.invalidateQueries({ queryKey: ["section"] });
     },
     onError: (error) => {
       console.error("Error creating CV", error);
@@ -87,14 +103,21 @@ export const useCV = () => {
 
   // Delete CV mutation
   const deleteCV = useMutation({
+    mutationKey: ["cv"],
     mutationFn: async (cvId: string) => {
       const response = await $api.delete(`/cvs/${cvId}`);
       return response.data;
     },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["cv"] as const,
+    //     exact: true,
+    //   });
+    // },
     onSuccess: () => {
-      // Optionally invalidate queries to refresh related data
-      // queryClient.invalidateQueries(["cv"]);
-      console.log("Successfully deleted CV!");
+      // Invalidate both `cv` and `section` queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["cv"] });
+      queryClient.invalidateQueries({ queryKey: ["section"] });
     },
     onError: (error) => {
       console.error("Error deleting CV", error);

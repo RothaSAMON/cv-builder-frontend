@@ -41,7 +41,11 @@
             </div>
           </section>
 
-          <div v-for="section in cvData.sections" :key="section._id">
+          <div
+            v-if="cvData?.sections"
+            v-for="section in cvData.sections"
+            :key="section._id"
+          >
             <DashboardPersonalDetailsForm
               v-if="section.type === 'PersonalDetail'"
               :firstName="section.content?.firstName || ''"
@@ -109,9 +113,17 @@
         <!-- Right Section -->
         <div class="right-section">
           <DashboardResume
+            v-if="cvData?.sections"
             :selectedTemplate="selectedTemplate"
-            :cvData="cvData.sections"
+            :cvData="isLoading || isRefetching || cvData.sections"
           />
+        </div>
+
+        <div v-if="isLoading || isRefetching" class="loading-state">
+          Loading...
+        </div>
+        <div v-else-if="isError" class="error-state">
+          Failed to load CV data.
         </div>
       </div>
     </div>
@@ -147,8 +159,8 @@ const route = useRoute();
 const { fetchCVById } = useCV();
 const cvId = computed(() => route.params.id);
 
-const { data: cvData, isLoading, isError } = fetchCVById(cvId.value);
-
+const { data: cvData, isError, isRefetching } = fetchCVById(cvId.value);
+// const { isLoading } = fetchCVById;
 // Handle form submission
 const handleSubmit = () => {
   console.log("Form submitted with data:", cvData.value);
