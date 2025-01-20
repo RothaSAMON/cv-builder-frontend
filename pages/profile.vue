@@ -7,23 +7,26 @@
   <div class="profile-container">
     <a-row justify="center" class="profile-content-wrapper">
       <div class="profile-card">
-        <div class="profile-avatar-wrapper">
-          <a-avatar
-            class="profile-avatar primary-border-color"
-            :size="100"
-            :src="userData.imageProfile || defaultImage"
-          />
-          <div class="upload-icon" @click="triggerFileUpload">
-            <CameraFilled />
+        <a-spin :spinning="imageUploading">
+          <div class="profile-avatar-wrapper">
+            <a-avatar
+              class="profile-avatar primary-border-color"
+              :size="100"
+              :src="profileImage || userData.imageProfile || defaultImage"
+            />
+            <div class="upload-icon" @click="triggerFileUpload">
+              <CameraFilled />
+            </div>
+            <input
+              type="file"
+              ref="fileInput"
+              accept="image/*"
+              style="display: none"
+              @change="handleFileChange"
+            />
           </div>
-          <input
-            type="file"
-            ref="fileInput"
-            accept="image/*"
-            style="display: none"
-            @change="handleFileChange"
-          />
-        </div>
+        </a-spin>
+
         <div>
           <h3>{{ userData?.firstName || "User" }} {{ userData?.lastName }}</h3>
           <p class="sub-title">{{ userData?.email }}</p>
@@ -117,11 +120,12 @@ const defaultImage =
   "https://www.pngitem.com/pimgs/m/22-223968_default-profile-picture-circle-hd-png-download.png";
 
 const profileImage = ref<string | null>(null);
+  const imageUploading = ref(false);
 
-const { userQuery, updateUser } = useUser(); // Import updateUser
+const { userQuery, updateUser, updateProfileImage } = useUser(); // Import updateUser
 const userData = computed(() => userQuery.data.value?.data || {});
 
-const handleFileChange = (event: Event) => {
+const handleFileChange = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) {
     const reader = new FileReader();
@@ -129,6 +133,20 @@ const handleFileChange = (event: Event) => {
       profileImage.value = reader.result as string;
     };
     reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    imageUploading.value = true;
+
+    try {
+      await updateProfileImage.mutateAsync(formData);
+      console.log("Profile image updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile image:", error);
+    } finally {
+      imageUploading.value = false;
+    }
   }
 };
 

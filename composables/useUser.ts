@@ -66,8 +66,41 @@ export const useUser = () => {
     },
   });
 
+  // Patch Profile Image
+  const updateProfileImage = useMutation({
+    mutationFn: async (imageData: FormData) => {
+      const response = await $api.patch<JsonResponseType<User>>(
+        "/profile/image",
+        imageData
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the user data after a successful patch
+      // queryClient.invalidateQueries(["user"]);
+      console.log("Successfully updated profile image!");
+    },
+  });
+
+  // Delete Profile Image
+  const deleteProfileImage = useMutation({
+    mutationFn: async () => {
+      const response = await $api.delete<JsonResponseType<User>>(
+        "/profile/image"
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the user data after a successful delete
+      // queryClient.invalidateQueries(["user"]);
+      console.log("Successfully deleted profile image!");
+    },
+  });
+
   return {
     userQuery,
     updateUser,
+    updateProfileImage,
+    deleteProfileImage
   };
 };
