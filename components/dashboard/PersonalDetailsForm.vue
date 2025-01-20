@@ -129,6 +129,9 @@ type UpdatePersonalContent = {
   imageUrl?: string;
 };
 
+const route = useRoute();
+const cvId = route.params.id as string;
+
 // Form Submission
 const onSubmit = handleSubmit(async (values) => {
   // Create the updated section data in the required format
@@ -146,7 +149,7 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     // Send the correctly formatted data to the backend
     const response = await updateSection.mutateAsync({
-      cvId: "678b5c8f0845662ccece9520", // Example CV ID
+      cvId: cvId, // Example CV ID
       updateContent: requestBody, // Send the entire requestBody as required
     });
 

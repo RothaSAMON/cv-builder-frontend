@@ -13,11 +13,13 @@
     </section>
 
     <!-- Resume Cards -->
-    <a-row :gutter="16">
+    <a-row :gutter="[16, 16]">
       <a-col
         v-for="resume in displayedResumes"
         :key="resume._id"
-        :span="8"
+        :xs="24"
+        :sm="12"
+        :lg="8"
         @click="goToResume(resume._id)"
       >
         <a-card class="card" :hoverable="true">
@@ -49,9 +51,7 @@
 
     <!-- See More Button -->
     <div v-if="hasMoreData" class="see-more-container">
-      <a-button type="primary" @click="loadMore">
-        See More
-      </a-button>
+      <a-button type="primary" @click="loadMore"> See More </a-button>
     </div>
   </div>
 </template>
@@ -80,7 +80,9 @@ const itemsPerLoad = 6; // Number of items to load per click
 const displayedCount = ref(itemsPerLoad); // Number of resumes currently displayed
 
 // Computed property to get displayed resumes
-const displayedResumes = computed(() => cvData.value.slice(0, displayedCount.value));
+const displayedResumes = computed(() =>
+  cvData.value.slice(0, displayedCount.value)
+);
 
 // Determine if there's more data to load
 const hasMoreData = computed(() => displayedCount.value < cvData.value.length);
@@ -109,6 +111,7 @@ watchEffect(() => {
 <style scoped>
 .list-container {
   margin: 24px 0;
+  padding: 0 16px;
 }
 
 .resume-des {
@@ -150,5 +153,27 @@ watchEffect(() => {
 
 .card {
   margin: 12px 0;
+}
+
+/* Ensure consistent gutter spacing on smaller screens */
+.ant-row {
+  margin-left: -8px !important;
+  margin-right: -8px !important;
+}
+.ant-col {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+@media (max-width: 600px) {
+  .resume-des {
+    display: none;
+  }
+  .list-header {
+    display: flex;
+    justify-content: end;
+    align-items: start;
+    margin: 0;
+  }
 }
 </style>

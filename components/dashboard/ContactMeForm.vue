@@ -75,7 +75,10 @@ const { handleSubmit, values } = useForm({
 });
 
 // Initialize Patch Function
-const { updateSection } = useSection(); // Reuse the `updateSection` mutation
+const { updateSection } = useSection();
+const route = useRoute();
+const cvId = route.params.id as string;
+console.log("Cv id", cvId)
 
 // Form Submission
 const onSubmit = handleSubmit(async (data) => {
@@ -92,7 +95,7 @@ const onSubmit = handleSubmit(async (data) => {
   try {
     // Send the correctly formatted payload to the backend
     const response = await updateSection.mutateAsync({
-      cvId: "678b5c8f0845662ccece9520", // Example CV ID (replace with the correct ID)
+      cvId: cvId, // Example CV ID (replace with the correct ID)
       updateContent: requestBody, // Send the full `requestBody` object
     });
 

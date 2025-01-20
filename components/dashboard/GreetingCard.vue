@@ -12,9 +12,11 @@
       <div class="text-section">
         <h3 class="title">Get the very best apps for your store</h3>
         <p class="subtitle">Upgrade to the new checkout automation.</p>
-        <a-button class="resumes-button" type="primary" size="large" ghost>
-          <AppstoreOutlined /> See Resumes
-        </a-button>
+        <NuxtLink to="/resumes">
+          <a-button class="resumes-button" type="primary" size="large" ghost>
+            <AppstoreOutlined /> See Resumes
+          </a-button>
+        </NuxtLink>
       </div>
       <div class="greeting-image">
         <NuxtImg
@@ -74,5 +76,15 @@ export default {
 
 .resumes-button {
   background-color: var(--background-color);
+}
+
+@media (max-width: 600px) {
+  .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
 }
 </style>

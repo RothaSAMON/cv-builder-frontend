@@ -109,6 +109,8 @@ if (props.languages) {
 
 // Patch functionality
 const { updateSection } = useSection();
+const route = useRoute();
+const cvId = route.params.id as string;
 
 const onSubmit = handleSubmit(async (data) => {
   // Format payload for the backend
@@ -123,7 +125,7 @@ const onSubmit = handleSubmit(async (data) => {
   try {
     // Send the formatted data to the backend
     const response = await updateSection.mutateAsync({
-      cvId: "678b5c8f0845662ccece9520", // Example CV ID (replace with dynamic value)
+      cvId: cvId, // Example CV ID (replace with dynamic value)
       updateContent: requestBody,
     });
 

@@ -114,9 +114,15 @@ const handleOk = handleSubmit(async (formValues) => {
       title: formValues.title,
       templateUrl: formValues.templateUrl,
     });
+    console.log("Response from createCV:", data);
 
-    if (data.data._id) {
-      navigateTo(`resumes/${data.data._id}/edit`);
+    if (data && data._id) {
+      navigateTo(`resumes/${data._id}`);
+    } else {
+      alertStore.showAlert({
+        message: "Failed to create resume. Please try again.",
+        type: "error",
+      });
     }
   }
 
