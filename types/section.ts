@@ -6,11 +6,12 @@ export interface UpdatePersonalContent {
   lastName?: string;
   position?: string;
   summary?: string;
+  imageUrl?: string;
 }
 
 // Type for Contact Content
 export interface UpdateContactContent {
-  phone?: string;
+  phoneNumber?: string;
   email?: string;
   address?: string;
 }
@@ -24,14 +25,16 @@ export interface UpdateSkillContent {
 // Type for Experience Content
 export interface UpdateExperienceContent {
   jobTitle?: string;
-  responsibilities?: string[];
-  startDate?: Date;
-  endDate?: Date;
+  // responsibilities?: string[];
+  startDate?: string;
+  endDate?: string;
+  position?: string;
+  description?: string;
 }
 
 // Type for Education Content
 export interface UpdateEducationContent {
-  school?: string;
+  schoolName?: string;
   degreeMajor?: string;
   startDate?: Date;
   endDate?: Date;

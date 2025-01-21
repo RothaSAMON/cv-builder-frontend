@@ -1,14 +1,21 @@
 <template>
   <header class="header-container">
-    <section class="user-info" @click="toggleDropdown">
+    <section
+      class="user-info"
+      @mouseover="isDropdownOpen = true"
+      @mouseleave="isDropdownOpen = false"
+      @click="navigateToProfile"
+    >
       <a-avatar
         class="user-avatar"
         size="large"
-        src="https://m.media-amazon.com/images/M/MV5BNWI4ZTJiZmUtZGI5MC00NTk4LTk2OTYtNDU3NTJiM2QxNzM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
+        :src="userData?.imageProfile || defaultAvatar"
       />
       <div class="user-details">
-        <h3 class="user-name">Samon Rotha</h3>
-        <p class="user-role">Set your target role</p>
+        <h3 class="user-name">
+          {{ userData?.firstName || "User" }} {{ userData?.lastName }}
+        </h3>
+        <p class="user-role">{{ userData?.email || "example@gmail.com" }}</p>
       </div>
       <span class="dropdown-icon" :class="{ rotated: isDropdownOpen }">▼</span>
     </section>
@@ -16,23 +23,35 @@
     <!-- User Details Dropdown -->
     <transition name="fade">
       <div v-if="isDropdownOpen" class="dropdown-details">
-        <p><strong>First Name:</strong> John</p>
-        <p><strong>Last Name:</strong> Doe</p>
-        <p><strong>Gender:</strong> Male</p>
-        <p><strong>Email:</strong> johndoe@example.com</p>
+        <p><strong>First Name:</strong> {{ userData?.firstName }}</p>
+        <p><strong>Last Name:</strong> {{ userData?.lastName }}</p>
+        <p><strong>Gender:</strong> {{ userData?.gender }}</p>
+        <p><strong>Email:</strong> {{ userData?.email }}</p>
       </div>
     </transition>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { useUser } from "~/composables/useUser";
 
 const isDropdownOpen = ref(false);
 
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
+// Navigate to profile page on click
+const router = useRouter();
+const navigateToProfile = () => {
+  router.push("/profile");
 };
+
+// Fetch user data
+const { userQuery } = useUser();
+const userData = computed(() => userQuery.data.value?.data);
+
+// Default avatar image
+const defaultAvatar =
+  "https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.webp";
 </script>
 
 <style scoped>
@@ -50,6 +69,7 @@ const toggleDropdown = () => {
   align-items: center;
   gap: 1rem;
   cursor: pointer;
+  position: relative;
 }
 
 .user-details {

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useAuthStore } from "~/store/auth";
 import type { User } from "~/types/auth";
 import type { JsonResponseType } from "~/types/json";
@@ -6,6 +6,7 @@ import type { JsonResponseType } from "~/types/json";
 export const useUser = () => {
   const { $api } = useNuxtApp();
   const authStore = useAuthStore();
+  const queryClient = useQueryClient();
 
   const userQuery = useQuery({
     queryKey: ["user"],
@@ -15,17 +16,17 @@ export const useUser = () => {
       return response.data;
     },
     refetchOnWindowFocus: false,
-    retry: 1, // Retry once on failure
+    retry: 1,
   });
 
   // Computed properties for easier access
-  const userData = computed(() => userQuery.data.value); // User data
-  const isUserLoaded = computed(() => !!userData.value); // Boolean if user is loaded
+  const userData = computed(() => userQuery.data.value?.data);
+  const isUserLoaded = computed(() => !!userData.value);
 
   //   Update auth store when user data is fetched successfully
   watch(userData, (data) => {
     if (data) {
-      authStore.setUser(data.data); // Update store
+      authStore.setUser(data); // Update store
     }
   });
 
@@ -50,7 +51,64 @@ export const useUser = () => {
     }
   );
 
+  // Update User Data
+  const updateUser = useMutation({
+    mutationKey: ["user"],
+    mutationFn: async (updatedData: User) => {
+      const response = await $api.put<JsonResponseType<User>>(
+        "/profile",
+        updatedData
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["user"] as const,
+        exact: true,
+      });
+    },
+  });
+
+  // Patch Profile Image
+  const updateProfileImage = useMutation({
+    mutationKey: ["user"],
+    mutationFn: async (imageData: FormData) => {
+      const response = await $api.patch<JsonResponseType<User>>(
+        "/profile/image",
+        imageData
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["user"] as const,
+        exact: true,
+      });
+    },
+  });
+
+  // Delete Profile Image
+  const deleteProfileImage = useMutation({
+    mutationKey: ["user"],
+    mutationFn: async () => {
+      const response = await $api.delete<JsonResponseType<User>>(
+        "/profile/image"
+      );
+      return response.data;
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["user"] as const,
+        exact: true,
+      });
+    },
+  });
+
   return {
     userQuery,
+    updateUser,
+    updateProfileImage,
+    deleteProfileImage,
   };
 };

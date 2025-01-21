@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <DashboardGreetingCard />
-    <DashboardGuideCard />
+    <!-- <DashboardGuideCard /> -->
 
     <ResumeList :showCreateButton="false" />
   </div>

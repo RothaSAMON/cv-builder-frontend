@@ -1,10 +1,17 @@
 <template>
   <div class="container">
-    <DashboardPageHeader
+    <!-- <DashboardPageHeader
       title="Resumes Action"
       subTitle="Create your resumes to find a job"
       :breadcrumbRoutes="routes"
-    />
+    /> -->
+
+    <section class="resume-title-section">
+      <p>
+        It is suggested to refresh the page after submitting the data in case I
+        have not yet implemented the real-time process.
+      </p>
+    </section>
 
     <!-- Loading and Error States -->
     <div v-if="isLoading" class="loading-state">Loading...</div>
@@ -13,37 +20,18 @@
       <div class="split-screen">
         <!-- Left Section -->
         <div class="left-section">
-          <section class="templatep-container">
-            <h3>Select Template</h3>
-            <div class="template-selection">
-              <div
-                :class="[
-                  'template-image',
-                  { active: selectedTemplate === template1 },
-                ]"
-                @click="selectTemplate(template1)"
-              >
-                <img :src="template1" alt="Template 1" />
-              </div>
-              <div
-                :class="[
-                  'template-image',
-                  { active: selectedTemplate === template2 },
-                ]"
-                @click="selectTemplate(template2)"
-              >
-                <img :src="template2" alt="Template 2" />
-              </div>
-            </div>
-          </section>
-
-          <div v-for="section in cvData.sections" :key="section._id">
+          <div
+            v-if="cvData?.sections"
+            v-for="section in cvData.sections"
+            :key="section._id"
+          >
             <DashboardPersonalDetailsForm
               v-if="section.type === 'PersonalDetail'"
               :firstName="section.content?.firstName || ''"
               :lastName="section.content?.lastName || ''"
               :personalPosition="section.content?.position || ''"
               :personalSummary="section.content?.summary || ''"
+              :imageUrl="section.content?.imageUrl || ''"
             />
 
             <DashboardSkillsForm
@@ -90,7 +78,7 @@
           </div>
 
           <!-- Submit Button -->
-          <div class="submit-container">
+          <!-- <div class="submit-container">
             <a-button
               type="primary"
               @click="handleSubmit"
@@ -98,15 +86,23 @@
             >
               Submit
             </a-button>
-          </div>
+          </div> -->
         </div>
 
         <!-- Right Section -->
         <div class="right-section">
           <DashboardResume
+            v-if="cvData?.sections"
             :selectedTemplate="selectedTemplate"
-            :cvData="cvData"
+            :cvData="isLoading || isRefetching || cvData.sections"
           />
+        </div>
+
+        <div v-if="isLoading || isRefetching" class="loading-state">
+          Loading...
+        </div>
+        <div v-else-if="isError" class="error-state">
+          Failed to load CV data.
         </div>
       </div>
     </div>
@@ -116,23 +112,14 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
-// import DashboardPageHeader from "@/components/DashboardPageHeader.vue";
-// import DashboardPersonalDetailsForm from "@/components/dashboard/PersonalDetailsForm.vue";
-// import DashboardSkillsForm from "@/components/dashboard/SkillsForm.vue";
-// import DashboardLanguagueForm from "@/components/dashboard/LanguagueForm.vue";
-// import DashboardContactMeForm from "@/components/dashboard/ContactMeForm.vue";
-// import DashboardExperienceForm from "@/components/dashboard/ExperienceForm.vue";
-// import DashboardEducationForm from "@/components/dashboard/EducationForm.vue";
-// import DashboardReferenceForm from "@/components/dashboard/ReferenceForm.vue";
-// import DashboardResume from "@/components/dashboard/Resume.vue";
 
 const routes = [
   { path: "/resumes", breadcrumbName: "Resumes" },
   { path: "/resumes/:id", breadcrumbName: "Resumes Action" },
 ];
 definePageMeta({
-  layout: "default"
-})
+  layout: "default",
+});
 
 // Template selection
 const template1 =
@@ -151,8 +138,8 @@ const route = useRoute();
 const { fetchCVById } = useCV();
 const cvId = computed(() => route.params.id);
 
-const { data: cvData, isLoading, isError } = fetchCVById(cvId.value);
-
+const { data: cvData, isError, isRefetching } = fetchCVById(cvId.value);
+// const { isLoading } = fetchCVById;
 // Handle form submission
 const handleSubmit = () => {
   console.log("Form submitted with data:", cvData.value);
@@ -189,33 +176,6 @@ const handleSubmit = () => {
   overflow-x: auto;
 }
 
-.template-selection {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.template-image {
-  width: 120px;
-  height: auto;
-  cursor: pointer;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: border-color 0.3s ease;
-  border: 1px solid var(--border-color);
-}
-
-.template-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.template-image.active {
-  border-color: #007bff;
-}
-
 .submit-container {
   margin-top: 20px;
   text-align: center;
@@ -223,6 +183,15 @@ const handleSubmit = () => {
 
 .submit-button {
   width: 100%;
+}
+
+.resume-title-section {
+  border: 1px solid rgb(255, 194, 143);
+  background-color: rgb(255, 245, 224);
+  color: rgb(228, 90, 16);
+  border-radius: 8px;
+  padding-top: 12px;
+  padding-left: 8px;
 }
 
 @media only screen and (max-width: 600px) {

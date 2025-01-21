@@ -38,23 +38,29 @@
         <div class="flex-form-group">
           <!-- Start Date -->
           <a-form-item class="w-full" label="Start Date">
-            <input
-              class="w-full input-date"
-              type="date"
+            <Field
               :name="`fields.${index}.startDate`"
-              :value="formatDate(props.experiences[index]?.startDate)"
-              @input="updateStartDate($event, index)"
+              as="a-input"
+              type="date"
+              placeholder="Start Date"
+            />
+            <ErrorMessage
+              :name="`fields.${index}.startDate`"
+              class="error-message"
             />
           </a-form-item>
 
           <!-- End Date -->
           <a-form-item class="w-full" label="End Date">
-            <input
-              class="w-full input-date"
-              type="date"
+            <Field
               :name="`fields.${index}.endDate`"
-              :value="formatDate(props.experiences[index]?.endDate)"
-              @input="updateEndDate($event, index)"
+              as="a-input"
+              type="date"
+              placeholder="End Date"
+            />
+            <ErrorMessage
+              :name="`fields.${index}.endDate`"
+              class="error-message"
             />
           </a-form-item>
         </div>
@@ -92,33 +98,35 @@
       </a-button>
     </a-form>
   </div>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
 import { useFieldArray, useForm, Field, ErrorMessage } from "vee-validate";
-import { z } from "zod";
+import { optional, z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
 import TextAreaForm from "@/components/TextAreaForm.vue"; // TextAreaForm component
-import dayjs from "dayjs";
+import type { UpdateExperienceContent } from "~/types/section";
+import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
 // Props received from the parent
 const props = defineProps<{
-  experiences: Array<{
-    jobTitle: string;
-    position: string;
-    startDate: string;
-    endDate: string;
-    description?: string;
-  }>;
+  experiences: UpdateExperienceContent[];
 }>();
 
 // Validation schema for an individual experience
 const ExperienceSchema = z.object({
-  jobTitle: z.string().min(1, "Job Title is required"),
-  position: z.string().min(1, "Position is required"),
-  startDate: z.string().min(1, "Start Date is required"),
-  endDate: z.string().min(1, "End Date is required"),
+  jobTitle: z.string().optional(),
+  position: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
   description: z.string().optional(),
 });
 
@@ -131,28 +139,11 @@ const FormSchema = z.object({
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: props.experiences || [], // Use the passed experiences or an empty array
+    fields: props.experiences || [],
   },
 });
 
 const { fields, push, remove } = useFieldArray("fields");
-
-// Format date to the required format for the input[type="date"] field (YYYY-MM-DD)
-const formatDate = (date: string) => {
-  return dayjs(date).format("YYYY-MM-DD"); // Ensure the date is in the correct format
-};
-
-// Update startDate
-const updateStartDate = (event: Event, index: number) => {
-  const newStartDate = (event.target as HTMLInputElement).value;
-  props.experiences[index].startDate = newStartDate;
-};
-
-// Update endDate
-const updateEndDate = (event: Event, index: number) => {
-  const newEndDate = (event.target as HTMLInputElement).value;
-  props.experiences[index].endDate = newEndDate;
-};
 
 // Add a new field
 const addField = () => {
@@ -170,9 +161,46 @@ const removeField = (index: number) => {
   remove(index);
 };
 
-// Submit form handler
-const onSubmit = handleSubmit((data) => {
-  console.log("Submitted data:", data);
+// Patch functionality
+const { updateSection } = useSection();
+const alertStore = useAlertStore();
+const route = useRoute();
+const cvId = route.params.id as string;
+
+const onSubmit = handleSubmit(async (data) => {
+  // Format payload for the backend
+  const requestBody = {
+    type: "Experiences",
+    content: data.fields.map((field) => ({
+      jobTitle: field.jobTitle,
+      position: field.position,
+      startDate: field.startDate,
+      endDate: field.endDate,
+      description: field.description || "",
+    })),
+  };
+
+  try {
+    // Send the formatted data to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: cvId, // Replace with dynamic CV ID
+      updateContent: requestBody,
+    });
+
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
+  }
 });
 </script>
 
@@ -190,5 +218,4 @@ const onSubmit = handleSubmit((data) => {
   color: red;
   font-size: 0.9rem;
 }
-
 </style>

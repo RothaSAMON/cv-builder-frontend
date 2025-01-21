@@ -8,13 +8,13 @@
     <a-form @submit.prevent="onSubmit" layout="vertical">
       <div class="flex-form-group">
         <InputForm
-          :initial-value="phoneNumber"
+          :initial-value="props.phoneNumber"
           name="personalPhoneNumber"
           placeholder="+855 123 456"
           label="Phone Number"
         />
         <InputForm
-          :initial-value="email"
+          :initial-value="props.email"
           name="personalEmail"
           placeholder="example@gmail.com"
           label="Email"
@@ -23,7 +23,7 @@
 
       <!-- Address Field (Optional) -->
       <TextAreaForm
-        :initial-value="address"
+        :initial-value="props.address"
         name="personalAddress"
         label="Address"
         placeholder="Current address"
@@ -35,6 +35,12 @@
       </a-form-item>
     </a-form>
   </section>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -43,6 +49,8 @@ import * as z from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import InputForm from "~/components/InputForm.vue";
 import TextAreaForm from "~/components/TextAreaForm.vue";
+import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
 // Define types for the contact props
 interface ContactProps {
@@ -64,7 +72,7 @@ const schema = z.object({
 });
 
 // Initialize the form with validation schema and initial values
-const { handleSubmit, values, setFieldValue } = useForm({
+const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(schema),
   initialValues: {
     personalPhoneNumber: props.phoneNumber || "", // Initialize with the prop value
@@ -73,13 +81,50 @@ const { handleSubmit, values, setFieldValue } = useForm({
   },
 });
 
-const onSubmit = handleSubmit((data) => {
-  console.log("Form submitted successfully:", data);
+// Initialize Patch Function
+const { updateSection } = useSection();
+const alertStore = useAlertStore();
+const route = useRoute();
+const cvId = route.params.id as string;
+
+// Form Submission
+const onSubmit = handleSubmit(async (data) => {
+  // Create the formatted payload
+  const requestBody = {
+    type: "Contact", // Fixed type
+    content: {
+      phoneNumber: data.personalPhoneNumber,
+      email: data.personalEmail,
+      address: data.personalAddress,
+    },
+  };
+
+  try {
+    // Send the correctly formatted payload to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: cvId,
+      updateContent: requestBody,
+    });
+
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
+  }
 });
 </script>
 
 <style scoped>
-.form-row {
+.flex-form-group {
   display: flex;
   align-items: flex-start;
   gap: 12px;

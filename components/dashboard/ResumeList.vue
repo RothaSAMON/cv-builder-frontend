@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="list-container primary-border-color">
     <section class="list-header">
       <!-- Title for the resume list -->
       <p class="resume-des">
@@ -8,23 +8,25 @@
 
       <!-- Create Button (conditionally rendered) -->
       <div class="create-button-container" v-if="showCreateButton">
-        <a-button type="primary" @click="createResume">
-          <PlusOutlined /> Create
-        </a-button>
+        <DashboardCreateCvButton />
       </div>
     </section>
 
     <!-- Resume Cards -->
-    <a-row :gutter="16">
-      <!-- Dynamically render fetched resumes -->
+    <a-row :gutter="[16, 16]">
       <a-col
-        v-for="resume in paginatedResumes"
+        v-for="resume in displayedResumes"
         :key="resume._id"
-        :span="8"
-        @click="goToResume(resume._id)"
+        :xs="24"
+        :sm="12"
+        :lg="8"
       >
-        <a-card :hoverable="true">
-          <a-row align="middle" justify="center">
+        <a-card class="card" :hoverable="true">
+          <a-row
+            align="middle"
+            justify="center"
+            @click="goToResume(resume._id)"
+          >
             <!-- Resume Preview Image -->
             <a-col :span="24" class="image-container">
               <NuxtImg
@@ -39,62 +41,74 @@
 
             <!-- Resume Title and Author -->
             <a-col :span="24" class="title-container">
+              <p class="sub-title">Title:</p>
               <h3>{{ resume.title }}</h3>
-              <p class="sub-title">
-                Created by: {{ resume.userId.firstName }}
-                {{ resume.userId.lastName }}
-              </p>
             </a-col>
           </a-row>
+          <div class="button-container">
+            <a-button
+              class="delete-button"
+              type="danger"
+              @click="confirmDelete(resume._id)"
+            >
+              Delete
+            </a-button>
+          </div>
         </a-card>
       </a-col>
     </a-row>
 
-    <!-- Pagination -->
-    <a-pagination
-      :current="currentPage"
-      :pageSize="itemsPerPage"
-      @change="onPageChange"
-      class="pagination"
-    />
+    <div v-if="!cvData || cvData.length === 0" class="no-data-message">
+      <p class="sub-title">No resumes available yet.</p>
+      <img src="@/assets/images/NoData.jpg" alt="No-Data" />
+    </div>
+
+    <!-- See More Button -->
+    <div v-if="hasMoreData" class="see-more-container">
+      <a-button type="primary" @click="loadMore"> See More </a-button>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { PlusOutlined } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import { useCV } from "../../composables/useCv";
+import { Modal } from "ant-design-vue";
 
 // Props
 defineProps({
   showCreateButton: {
     type: Boolean,
-    default: true, // Default value to show the button
+    default: true,
   },
 });
 
-const { cvQueryAll } = useCV();
+const { cvQueryAll, deleteCV } = useCV();
 const router = useRouter();
 
 // Fetch data from API
-const cvData = computed(() => cvQueryAll.data.value || []);
+const cvData = computed(() => cvQueryAll.data.value?.data || []);
 
-// console.log("My data", cvQueryAll.data)
+// Lazy loading settings
+const itemsPerLoad = 6; // Number of items to load per click
+const displayedCount = ref(itemsPerLoad); // Number of resumes currently displayed
 
-const itemsPerPage = 10;
-const currentPage = ref(1);
+// Computed property to get displayed resumes
+const displayedResumes = computed(() =>
+  Array.isArray(cvData.value) ? cvData.value.slice(0, displayedCount.value) : []
+);
 
-// Paginated resumes based on current page
-const paginatedResumes = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  return cvData.value.slice(startIndex, endIndex);
-});
+// Determine if there's more data to load
+const hasMoreData = computed(
+  () =>
+    displayedCount.value <
+    (Array.isArray(cvData.value) ? cvData.value.length : 0)
+);
 
-// Change page
-const onPageChange = (page: number) => {
-  currentPage.value = page;
+// Load more resumes
+const loadMore = () => {
+  displayedCount.value += itemsPerLoad;
 };
 
 // Navigate to specific resume detail page
@@ -102,11 +116,32 @@ const goToResume = (resumeId: string) => {
   router.push(`/resumes/${resumeId}`);
 };
 
-// Handle Create button
-const createResume = () => {
-  console.log("Create Resume clicked");
+// Confirm delete action
+const confirmDelete = (cvId: string) => {
+  Modal.confirm({
+    title: "Are you sure you want to delete this resume?",
+    content: "This action cannot be undone.",
+    okText: "Yes",
+    okType: "danger",
+    cancelText: "No",
+    onOk: () => deleteResume(cvId),
+  });
 };
 
+const deleteResume = async (cvId: string) => {
+  try {
+    // Call mutateAsync on the deleteCV mutation object
+    await deleteCV.mutateAsync(cvId);
+    console.log("Resume deleted successfully!");
+
+    // Refetch or update the resumes list
+    cvQueryAll.refetch(); // Ensures data stays in sync with the server
+  } catch (error) {
+    console.error("Error deleting resume:", error);
+  }
+};
+
+// Error handling for API fetch
 const hasError = computed(() => cvQueryAll.isError.value);
 
 watchEffect(() => {
@@ -115,10 +150,16 @@ watchEffect(() => {
     router.push("/login");
   }
 });
-
 </script>
 
 <style scoped>
+.list-container {
+  margin: 24px 0;
+  padding: 0 16px;
+  border-radius: 8px;
+  padding: 16px 14px;
+}
+
 .resume-des {
   text-align: start;
 }
@@ -138,8 +179,12 @@ watchEffect(() => {
   text-align: center;
   margin-top: 12px;
 }
+.title-container p {
+  padding: 0;
+  margin: 0;
+}
 
-.pagination {
+.see-more-container {
   margin-top: 20px;
   text-align: center;
 }
@@ -154,5 +199,54 @@ watchEffect(() => {
   justify-content: space-between;
   align-items: end;
   margin: 16px 0px;
+}
+
+.card {
+  margin: 12px 0;
+}
+
+/* Ensure consistent gutter spacing on smaller screens */
+.ant-row {
+  margin-left: -8px !important;
+  margin-right: -8px !important;
+}
+.ant-col {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-data-message img {
+  width: 100%;
+  max-width: 500px;
+}
+
+.delete-button {
+  background-color: var(--error-color-100);
+  color: var(--error-color);
+  border: 1px solid var(--error-color-200);
+}
+.button-container {
+  display: flex;
+  justify-content: end;
+  align-items: end;
+}
+
+@media (max-width: 600px) {
+  .resume-des {
+    display: none;
+  }
+  .list-header {
+    display: flex;
+    justify-content: end;
+    align-items: start;
+    margin: 0;
+  }
 }
 </style>

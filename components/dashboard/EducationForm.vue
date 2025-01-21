@@ -81,6 +81,12 @@
       </a-button>
     </a-form>
   </div>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -89,6 +95,7 @@ import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
+import { useAlertStore } from "~/store/alertStore";
 
 // Props received from the parent
 const props = defineProps<{
@@ -119,13 +126,6 @@ const { handleSubmit, values } = useForm({
   },
 });
 
-// const { fields, push, remove } = useFieldArray<{
-//   schoolName: string;
-//   degreeMajor: string;
-//   startDate: string;
-//   endDate: string;
-// }>("fields");
-
 // Add a new field
 const addField = () => {
   push({ schoolName: "", degreeMajor: "", startDate: "", endDate: "" });
@@ -136,9 +136,8 @@ const removeField = (index: number) => {
   remove(index);
 };
 
-// Format date to the required format for the input[type="date"] field (YYYY-MM-DD)
 const formatDate = (date: string) => {
-  return dayjs(date).format("YYYY-MM-DD"); // Ensure the date is in the correct format
+  return dayjs(date).format("YYYY-MM-DD");
 };
 
 const { fields, push, remove } = useFieldArray<{
@@ -160,10 +159,43 @@ const updateEndDate = (event: Event, index: number) => {
   value.endDate = newEndDate;
 };
 
+const { updateSection } = useSection();
+const alertStore = useAlertStore();
+const route = useRoute();
+const cvId = route.params.id as string;
+
 // Submit form handler
-const onSubmit = handleSubmit((data) => {
-  console.log("Submitted data:", data);
-  // Do not reset the form here
+const onSubmit = handleSubmit(async (data) => {
+  const requestBody = {
+    type: "Education",
+    content: data.fields.map((fields) => ({
+      schoolName: fields.schoolName,
+      degreeMajor: fields.degreeMajor,
+      startDate: fields.startDate,
+      endDate: fields.endDate,
+    })),
+  };
+
+  try {
+    const response = await updateSection.mutateAsync({
+      cvId: cvId,
+      updateContent: requestBody,
+    });
+
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
+  }
 });
 </script>
 

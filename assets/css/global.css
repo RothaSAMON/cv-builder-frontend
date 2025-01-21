@@ -18,6 +18,13 @@
 
   --font-size-base: 16px;
   --border-radius: 8px;
+  
+  /* Base Font Sizes */
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.25rem;
+  --font-size-p: 1rem;
+  --font-size-small: 0.875rem;
 }
 
 /* Custom Class Styles */
@@ -67,10 +74,73 @@ h3 {
   font-size: 14px;
 }
 
+.resume-title-section {
+  padding: 4px;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
 .input-date {
   border: 1px solid rgb(215, 215, 215);
   border-radius: 5px;
   padding: 4px;
+}
+
+.error-button {
+  background-color: var(--error-color);
+  color: white;
+}
+
+/* Default Font Sizes */
+h1 {
+  font-size: var(--font-size-h1);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+}
+
+p {
+  font-size: var(--font-size-p);
+}
+
+.small-text {
+  font-size: var(--font-size-small);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1280px) {
+  :root {
+    --font-size-h1: 2.25rem;
+    --font-size-h2: 1.85rem;
+    --font-size-h3: 1.2rem;
+    --font-size-p: 0.95rem;
+    --font-size-small: 0.85rem;
+  }
+}
+
+@media (max-width: 960px) {
+  :root {
+    --font-size-h1: 2rem;
+    --font-size-h2: 1.75rem;
+    --font-size-h3: 1rem;
+    --font-size-p: 0.9rem;
+    --font-size-small: 0.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --font-size-h1: 1.75rem;
+    --font-size-h2: 1.5rem;
+    --font-size-h3: 1rem;
+    --font-size-p: 0.85rem;
+    --font-size-small: 0.75rem;
+  }
 }
 
 /* Responsive Size */

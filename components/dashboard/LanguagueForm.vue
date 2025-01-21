@@ -56,6 +56,12 @@
       </a-button>
     </a-form>
   </div>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -64,48 +70,88 @@ import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
 import type { UpdateLanguageContent } from "~/types/section";
+import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
-// Define the validation schema
+// Validation schema for each language field
 const LanguageSchema = z.object({
   language: z.string().min(1, "Language is required"),
-  level: z.string().min(1, "Level is required"), // Validate that level is selected
+  level: z.string().min(1, "Level is required"), // Ensure a level is selected
 });
 
 const FormSchema = z.object({
   fields: z.array(LanguageSchema),
 });
 
-// Initialize form with validation
+// Initialize the form with validation
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: [], // This will be populated dynamically from parent data
+    fields: [],
   },
 });
 
-// Dynamically set initial values with languages data from parent (cvData)
+// Dynamic field management
 const { fields, push, remove } = useFieldArray("fields");
 
+// Add new language field
 const addField = () => {
   push({ language: "", level: "" });
 };
 
+// Remove a language field
 const removeField = (index: number) => {
   remove(index);
 };
 
-const onSubmit = handleSubmit((data) => {
-  console.log("Submitted data:", data);
-});
-
-// Props for languages passed from parent
+// Props for preloaded language data
 const props = defineProps<{ languages: UpdateLanguageContent[] }>();
-// Initialize form fields with languages data
-if (props.languages && props.languages.length > 0) {
+
+// Populate initial fields with preloaded data
+if (props.languages) {
   props.languages.forEach((language) => {
     push({ language: language.language, level: language.level });
   });
 }
+
+// Patch functionality
+const { updateSection } = useSection();
+const alertStore = useAlertStore();
+const route = useRoute();
+const cvId = route.params.id as string;
+
+const onSubmit = handleSubmit(async (data) => {
+  // Format payload for the backend
+  const requestBody = {
+    type: "Languages", // Fixed type
+    content: data.fields.map((field) => ({
+      language: field.language,
+      level: field.level,
+    })),
+  };
+
+  try {
+    // Send the formatted data to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: cvId,
+      updateContent: requestBody,
+    });
+
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
+  }
+});
 </script>
 
 <style scoped>

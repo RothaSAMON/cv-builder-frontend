@@ -5,10 +5,11 @@ import type { loginSchema } from "~/utils/schema";
 export interface User {
   id?: string;
   firstName?: string;
-  gmail?: string;
+  email?: string;
   lastName?: string;
   gender?: string;
-  dateOfBirth?: Date;
+  dateOfBirth?: string;
+  imageProfile?: string;
 }
 
 export interface Tokens {

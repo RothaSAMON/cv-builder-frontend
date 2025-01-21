@@ -55,27 +55,31 @@
         <a-button type="primary" html-type="submit">Submit</a-button>
       </a-form-item>
     </a-form>
-<!-- 
-    <div>
-      <h3>Reference Information</h3>
-      <p>First Name: {{ formValues.refFirstName }}</p>
-      <p>Last Name: {{ formValues.refLastName }}</p>
-      <p>Position: {{ formValues.refPosition }}</p>
-      <p>Email: {{ formValues.refEmail }}</p>
-      <p>Phone Number: {{ formValues.refPhoneNumber }}</p>
-      <p>Company: {{ formValues.refCompany }}</p>
-    </div> -->
   </section>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
+import { reactive } from "vue";
 import { useForm } from "vee-validate";
 import * as z from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import InputForm from "~/components/InputForm.vue";
+import { useSection } from "~/composables/useSection";
 import type { UpdateReferenceContent } from "~/types/section";
+import { useAlertStore } from "~/store/alertStore";
 
-const props = defineProps<{ references: UpdateReferenceContent[] }>();
+// Define the prop type for references
+interface ReferenceProps {
+  references: UpdateReferenceContent[];
+}
+
+const props = defineProps<ReferenceProps>();
 
 const formValues = reactive({
   refFirstName: props?.references[0]?.firstName || "",
@@ -86,6 +90,7 @@ const formValues = reactive({
   refCompany: props?.references[0]?.company || "",
 });
 
+// Validation schema
 const schema = z.object({
   refFirstName: z.string().min(1, "First name is required"),
   refLastName: z.string().min(1, "Last name is required"),
@@ -95,12 +100,54 @@ const schema = z.object({
   refCompany: z.string().min(1, "Company name is required"),
 });
 
-const { handleSubmit } = useForm({
+// Initialize the form with Vee-Validate
+const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(schema),
+  initialValues: formValues,
 });
 
-const onSubmit = handleSubmit((values) => {
-  console.log("Reference Form Submitted:", values);
+// Initialize the patch mutation
+const { updateSection } = useSection();
+const alertStore = useAlertStore();
+const route = useRoute();
+const cvId = route.params.id as string;
+
+// Form submission logic
+const onSubmit = handleSubmit(async (data) => {
+  // Format the payload with type and content
+  const requestBody = {
+    type: "Reference",
+    content: {
+      firstName: data.refFirstName,
+      lastName: data.refLastName,
+      position: data.refPosition,
+      email: data.refEmail,
+      phoneNumber: data.refPhoneNumber,
+      company: data.refCompany,
+    },
+  };
+
+  try {
+    // Send the formatted payload to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: cvId,
+      updateContent: requestBody,
+    });
+
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
+  }
 });
 </script>
 
@@ -109,6 +156,7 @@ const onSubmit = handleSubmit((values) => {
   display: flex;
   gap: 16px;
 }
+
 .sub-title {
   color: #888;
   font-size: 14px;

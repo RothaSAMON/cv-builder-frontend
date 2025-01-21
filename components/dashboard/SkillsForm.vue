@@ -53,6 +53,12 @@
       </a-button>
     </a-form>
   </div>
+
+  <CustomAlert
+    v-if="alertStore.isVisible"
+    :type="alertStore.type"
+    :message="alertStore.message"
+  />
 </template>
 
 <script setup lang="ts">
@@ -61,6 +67,8 @@ import { z } from "zod";
 import { toFieldValidator } from "@vee-validate/zod";
 import { DeleteOutlined } from "@ant-design/icons-vue";
 import type { UpdateSkillContent } from "~/types/section";
+import { useSection } from "~/composables/useSection";
+import { useAlertStore } from "~/store/alertStore";
 
 // Define the validation schema
 const SkillSchema = z.object({
@@ -75,7 +83,7 @@ const FormSchema = z.object({
 const { handleSubmit, values } = useForm({
   validationSchema: toFieldValidator(FormSchema),
   initialValues: {
-    fields: [], // This will be populated dynamically from parent data
+    fields: [], // Populated dynamically from parent props
   },
 });
 
@@ -90,16 +98,53 @@ const removeField = (index: number) => {
   remove(index);
 };
 
-const onSubmit = handleSubmit((data) => {
-  console.log("Submitted data:", data);
-});
-
 const props = defineProps<{ skills: UpdateSkillContent[] }>();
+
+// Populate initial skills
 if (props.skills) {
   props.skills.forEach((skill) => {
     push({ skill: skill.name, level: skill.level });
   });
 }
+
+// Initialize patch functionality
+const { updateSection } = useSection();
+const alertStore = useAlertStore();
+const route = useRoute();
+const cvId = route.params.id as string;
+
+const onSubmit = handleSubmit(async (data) => {
+  // Format the payload
+  const requestBody = {
+    type: "Skills", // Fixed type
+    content: data.fields.map((field) => ({
+      name: field.skill,
+      level: field.level,
+    })),
+  };
+
+  try {
+    // Send the formatted payload to the backend
+    const response = await updateSection.mutateAsync({
+      cvId: cvId, // Example CV ID (replace with your ID)
+      updateContent: requestBody,
+    });
+
+    if (response) {
+      alertStore.showAlert({
+        message: response.message,
+        type: "success",
+        duration: 5000,
+      });
+    }
+  } catch (error: any) {
+    alertStore.showAlert({
+      message: error.response.data.message,
+      type: "error",
+      duration: 5000,
+    });
+  }
+});
 </script>
 
 <style scoped>
