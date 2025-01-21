@@ -2,6 +2,25 @@
   <section class="export-button">
     <a-button @click="exportAsPDF">Export as PDF</a-button>
   </section>
+
+  <section class="templatep-container">
+    <h3>Select Template</h3>
+    <div class="template-selection">
+      <div
+        :class="['template-image', { active: selectedTemplate === template1 }]"
+        @click="selectTemplate(template1)"
+      >
+        <img :src="template1" alt="Template 1" />
+      </div>
+      <div
+        :class="['template-image', { active: selectedTemplate === template2 }]"
+        @click="selectTemplate(template2)"
+      >
+        <img :src="template2" alt="Template 2" />
+      </div>
+    </div>
+  </section>
+
   <div class="right-section">
     <section
       ref="resumeSection"
@@ -60,7 +79,6 @@
 
           <section class="reference-section">
             <h3 class="section-title">Reference</h3>
-
             <div v-for="(reference, index) in referenceSection" :key="index">
               <p>{{ reference?.firstName }} {{ reference?.lastName }}</p>
               <p>{{ reference?.company }}</p>
@@ -82,7 +100,6 @@
 
           <section class="experiences-section">
             <h3 class="section-title">Experience</h3>
-
             <div v-for="(experience, index) in experienceSection" :key="index">
               <p>{{ experience?.jobTitle }}</p>
               <p>{{ experience?.position }}</p>
@@ -97,7 +114,6 @@
 
           <section class="educations-section">
             <h3 class="section-title">Education</h3>
-
             <div v-for="(education, index) in educationSection" :key="index">
               <p>{{ education?.degreeMajor }}</p>
               <p class="sub-title">{{ education?.schoolName }}</p>
@@ -137,6 +153,17 @@ const props = defineProps<{
   cvData: UpdateSection[] | undefined;
 }>();
 
+
+// Declare the template images
+const template1 = FirstImage;
+const template2 = SecondImage;
+
+const selectedTemplate = ref(template1);  // Initialize with template1
+
+const selectTemplate = (template: string) => {
+  selectedTemplate.value = template;  // Update selectedTemplate
+};
+
 // Type guard for narrowing
 function isSectionType<T extends keyof UpdateSectionSchemasTypes>(
   section: UpdateSection,
@@ -145,7 +172,6 @@ function isSectionType<T extends keyof UpdateSectionSchemasTypes>(
   type: T;
   content: UpdateSectionSchemasTypes[T];
 } {
-  // Mapping types to match
   const typeMapping: Record<string, string> = {
     personal: "PersonalDetail",
     contact: "Contact",
@@ -156,10 +182,8 @@ function isSectionType<T extends keyof UpdateSectionSchemasTypes>(
     references: "Reference",
   };
 
-  // Ensure that the 'type' input gets
   const mappedType = typeMapping[type as keyof typeof typeMapping];
 
-  // Check if the section type matches the mapped type
   return section.type === mappedType;
 }
 
@@ -167,7 +191,6 @@ const sectionsMap = new Map(
   (props.cvData || []).map((section) => [section.type, section])
 );
 
-// Declare the data each types
 const personalSection = sectionsMap.get("PersonalDetail")
   ?.content as UpdatePersonalContent;
 const contactSection = sectionsMap.get("Contact")
@@ -185,7 +208,6 @@ const referenceSection = sectionsMap.get("Reference")
 
 // Reference to the resume section
 const resumeSection = ref<HTMLDivElement | null>(null);
-
 
 const exportAsPDF = async () => {
   const convertImageToBase64 = async (image: any) => {
@@ -250,9 +272,6 @@ const exportAsPDF = async () => {
 
   await saveAsPdf();
 };
-
-// State for selected template
-const selectedTemplate = ref(SecondImage);
 </script>
 
 <style scoped>
@@ -267,6 +286,34 @@ const selectedTemplate = ref(SecondImage);
   height: 100vh;
   overflow-y: auto;
 }
+
+.template-selection {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.template-image {
+  width: 120px;
+  height: auto;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+  border: 1px solid var(--border-color);
+}
+
+.template-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.template-image.active {
+  border-color: #007bff;
+}
+
 
 .export-button {
   display: flex;

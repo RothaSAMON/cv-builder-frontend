@@ -20,30 +20,6 @@
       <div class="split-screen">
         <!-- Left Section -->
         <div class="left-section">
-          <section class="templatep-container">
-            <h3>Select Template</h3>
-            <div class="template-selection">
-              <div
-                :class="[
-                  'template-image',
-                  { active: selectedTemplate === template1 },
-                ]"
-                @click="selectTemplate(template1)"
-              >
-                <img :src="template1" alt="Template 1" />
-              </div>
-              <div
-                :class="[
-                  'template-image',
-                  { active: selectedTemplate === template2 },
-                ]"
-                @click="selectTemplate(template2)"
-              >
-                <img :src="template2" alt="Template 2" />
-              </div>
-            </div>
-          </section>
-
           <div
             v-if="cvData?.sections"
             v-for="section in cvData.sections"
@@ -198,33 +174,6 @@ const handleSubmit = () => {
   border-radius: 8px;
   border: 1px solid var(--border-color);
   overflow-x: auto;
-}
-
-.template-selection {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.template-image {
-  width: 120px;
-  height: auto;
-  cursor: pointer;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: border-color 0.3s ease;
-  border: 1px solid var(--border-color);
-}
-
-.template-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.template-image.active {
-  border-color: #007bff;
 }
 
 .submit-container {
