@@ -7,7 +7,10 @@
     /> -->
 
     <section class="resume-title-section">
-      <h2>Untitled</h2>
+      <p>
+        It is suggested to refresh the page after submitting the data in case I
+        have not yet implemented the real-time process.
+      </p>
     </section>
 
     <!-- Loading and Error States -->
@@ -231,6 +234,15 @@ const handleSubmit = () => {
 
 .submit-button {
   width: 100%;
+}
+
+.resume-title-section {
+  border: 1px solid rgb(255, 194, 143);
+  background-color: rgb(255, 245, 224);
+  color: rgb(228, 90, 16);
+  border-radius: 8px;
+  padding-top: 12px;
+  padding-left: 8px;
 }
 
 @media only screen and (max-width: 600px) {

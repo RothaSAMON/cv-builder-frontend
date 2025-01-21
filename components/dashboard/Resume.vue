@@ -6,16 +6,14 @@
     <section
       ref="resumeSection"
       class="resume-template"
-      :style="{ backgroundImage: 'url(' + selectedTemplate + ')' }"
+      :style="{ backgroundImage: `url(${selectedTemplate})` }"
     >
       <div class="header-resume">
         <!-- Profile Image -->
-        <NuxtImg
+        <img
           class="profile-image"
-          :style="{
-            backgroundImage:
-              'url(' + personalSection?.imageUrl + ')',
-          }"
+          :src="personalSection?.imageUrl"
+          crossorigin="anonymous"
         />
 
         <!-- Dummy data overlay on resume -->
@@ -117,6 +115,8 @@
 
 <script setup lang="ts">
 import { defineProps, ref } from "vue";
+import SecondImage from "../../assets/images/ResumeTemplateRT.jpg";
+import FirstImage from "../../assets/images/ResumeTemplateRT2.jpg";
 import type {
   UpdateContactContent,
   UpdateEducationContent,
@@ -128,6 +128,8 @@ import type {
   UpdateSkillContent,
 } from "~/types/section";
 import type { UpdateSection } from "~/types/section";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 // Accept `selectedTemplate` as a prop
 const props = defineProps<{
@@ -182,31 +184,75 @@ const referenceSection = sectionsMap.get("Reference")
   ?.content as UpdateReferenceContent[];
 
 // Reference to the resume section
-const resumeSection = ref(null);
+const resumeSection = ref<HTMLDivElement | null>(null);
+
 
 const exportAsPDF = async () => {
-  const firstName = personalSection?.firstName ?? "Unknown";
-  const options = {
-    filename: `${firstName.replace(/ /g, "_")}_Resume.pdf`,
-    html2canvas: { scale: 1 },
-    jsPDF: {
+  const convertImageToBase64 = async (image: any) => {
+    try {
+      const response = await fetch(image, { mode: "cors" });
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error("Error converting image to Base64:", error);
+      return null;
+    }
+  };
+
+  const prepareImages = async () => {
+    if (!resumeSection.value) return;
+
+    const images = resumeSection.value.querySelectorAll("img");
+    await Promise.all(
+      Array.from(images).map(async (img) => {
+        if (!img.src.startsWith("data:image")) {
+          const base64 = await convertImageToBase64(img.src);
+          if (base64) {
+            img.src = base64 as string;
+            await new Promise((resolve) => (img.onload = resolve));
+          }
+        }
+      })
+    );
+  };
+
+  const saveAsPdf = async () => {
+    if (!resumeSection.value) return;
+
+    await prepareImages();
+
+    const canvas = await html2canvas(resumeSection.value, {
+      useCORS: true,
+      scale: 2,
+      backgroundColor: "#fff",
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
-      autoSize: true,
-      compress: true,
-    },
+    });
+
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+    pdf.save(`${personalSection?.firstName || "Resume"}.pdf`);
   };
 
-  const element = resumeSection.value;
-
-  if (element) {
-    // Ignore TypeScript error for the import
-    // @ts-ignore
-    const html2pdf = (await import("html2pdf.js")).default;
-    html2pdf().set(options).from(element).save();
-  }
+  await saveAsPdf();
 };
+
+// State for selected template
+const selectedTemplate = ref(SecondImage);
 </script>
 
 <style scoped>
@@ -253,8 +299,8 @@ const exportAsPDF = async () => {
   height: 130px;
   border-radius: 50%;
   background-size: cover;
-  background-position: center;
   border: 3px solid white;
+  object-fit: cover;
 }
 
 .overlay-text {
